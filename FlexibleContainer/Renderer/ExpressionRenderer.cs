@@ -1,4 +1,5 @@
-﻿using FlexibleContainer.Parser.Models;
+﻿using FlexibleContainer.Parser;
+using FlexibleContainer.Parser.Models;
 using Sitecore.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -8,12 +9,13 @@ using System.Web.Mvc;
 
 namespace FlexibleContainer.Renderer
 {
-    public static class NodeRenderer
+    public static class ExpressionRenderer
     {
-        public static string Render(Node rootNode, Func<string, string> contentFormatter = null)
+        public static string Render(string expression, Func<string, string> contentFormatter = null)
         {
-            Assert.ArgumentNotNull(rootNode, nameof(rootNode));
+            Assert.ArgumentNotNullOrEmpty(expression, nameof(expression));
 
+            var rootNode = ExpressionParser.Parse(expression);
             return RenderInner(rootNode.Children, contentFormatter); 
         }
 
