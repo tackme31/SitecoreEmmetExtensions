@@ -11,9 +11,9 @@ namespace FlexibleContainer.Parser
     {
         private static readonly Regex TagRegex = new Regex(
             @"^" +
-            @"(?<tag>[^#\s]+)" + 
-            @"(?<id>#[^.\s]+)?" +
-            @"(?<class>\.[^.\s]+){0,}" +
+            @"(?<tag>\S+?)" + 
+            @"(?<id>#\S+?)?" +
+            @"(?<class>\.\S+?){0,}" +
             @"(\[((?<attr>[^=\s]+(=""[^""]*"")?)\s?){0,}\])?" +
             @"({(?<content>.+)})?" +
             @"$",
@@ -41,7 +41,7 @@ namespace FlexibleContainer.Parser
             throw new NotImplementedException();
         }
 
-        private static Node CreateNode(string node)
+        public static Node CreateNode(string node)
         {
             var tagMatch = TagRegex.Match(node);
             if (!tagMatch.Success)
