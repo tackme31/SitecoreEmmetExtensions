@@ -82,35 +82,58 @@ namespace FlexibleContainer.Parser
             var sb = new StringBuilder();
             var nest = 0;
             var inContent = false;
+            var inAttr = false;
             foreach (var character in expression)
             {
                 // Update status
-                if (character == '{' && !inContent)
+                switch (character)
                 {
-                    inContent = true;
-                }
-                else if (character == '}' && inContent)
-                {
-                    inContent = false;
-                }
-                else if (character == '(' && !inContent)
-                {
-                    nest++;
-                }
-                else if (character == ')' && !inContent)
-                {
-                    nest--;
+                    case '{':
+                        if (!inContent && !inAttr)
+                        {
+                            inContent = true;
+                        }
+                        break;
+                    case '}':
+                        if (inContent && !inAttr)
+                        {
+                            inContent = false;
+                        }
+                        break;
+                    case '[':
+                        if (!inAttr && !inContent)
+                        {
+                            inAttr = true;
+                        }
+                        break;
+                    case ']':
+                        if (inAttr && !inContent)
+                        {
+                            inAttr = false;
+                        }
+                        break;
+                    case '(':
+                        if (!inContent && !inAttr)
+                        {
+                            nest++;
+                        }
+                        break;
+                    case ')':
+                        if (!inContent && !inAttr)
+                        {
+                            nest--;
+                        }
+                        break;
                 }
 
-                // A delimiter not in content and not is nested.
-                if (character == delimiter && nest == 0 && !inContent)
+                if (character != delimiter || inContent || inAttr || nest > 0)
                 {
-                    result.Add(sb.ToString());
-                    sb.Clear();
+                    sb.Append(character);
                     continue;
                 }
 
-                sb.Append(character);
+                result.Add(sb.ToString());
+                sb.Clear();
             }
 
             if (sb.Length > 0)
