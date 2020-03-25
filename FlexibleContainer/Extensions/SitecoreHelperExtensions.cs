@@ -2,7 +2,6 @@
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Helpers;
 using Sitecore.Mvc.Presentation;
-using System;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -11,14 +10,14 @@ namespace FlexibleContainer.Extensions
     public static class SitecoreHelperExtensions
     {
         private static readonly Regex StaticPlaceholderRegex = new Regex(@"^{{(?<placeholderKey>[^}]*)}}$");
-        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^\*{{(?<placeholderKey>[^}|]*?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?}}$");
+        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^\{\[(?<placeholderKey>[^}|]*?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?}\]}$");
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
         {
             Assert.ArgumentNotNull(helper, nameof(helper));
 
             var parameterValue = RenderingContext.Current.Rendering.Parameters["Expression"];
-            var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div{{}}" : parameterValue;
+            var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div{[container]}" : parameterValue;
             var result = ExpressionRenderer.Render(expression, contentFormatter);
             return new HtmlString(result);
 
