@@ -1,20 +1,7 @@
 # Flexible Container
-A Sitecore rendering to generate a placeholder with emmet-like syntax.
+A Sitecore rendering to generate a placeholder container with emmet-like syntax.
 
-## Sitecore コンポーネント
-- [ ] class & id (`div#id`, `a.class1.class2`)
-- [ ] sibling (`p+p`)
-- [ ] content (`a{Content}`)
-- [ ] placeholder
-	- [ ] static (`div{{place-holder-key}}`)
-	- [ ] dynamic (`div{{}}`)
-- [ ] iterate (`a*5`)
-	- [ ] `$`
-- [ ] grouping (`(div+p)*5`)
-- [ ] translate: (`h1{@(dictionary-key)}`)
-
----
-
+## Sample
 - input
 ```
 div.row>a[href="/search"]{Search}+div.col{{content}}
@@ -30,49 +17,16 @@ div.row>a[href="/search"]{Search}+div.col{{content}}
 </div>
 ```
 
----
+## TODO
+- [x] class & id (`div#id`, `a.class1.class2`)
+- [x] attribute (`input[type="checkbox" checked]`)
+- [x] content (`a{Content}`)
+- [x] sibling (`p+p`)
+- [x] grouping (`p+(div>h1)+p>a`)
+- [x] placeholder
+	- [x] static (`div{{place-holder-key}}`)
+	- [x] dynamic (`div{[place-holder-key|count:3|maxCount:3|seed:5]`)
+- [ ] translate: (`h1{@(dictionary-key)}`)
+- [ ] iterate (`a*5`)
+	- [ ] iterate counter `p*5>a{text $}`
 
-root>
-   aaa
-   +
-   bbb>
-       (ppp
-        +
-        ccc>
-           ddd
-           +
-           eee>
-               fff)
-       +
-       ggg
-       +
-       hhh>
-           iii
-
-ppp+ccc>
-ddd+eee>
-fff
-
->で区切る
-+で区切り、それぞれに対して再帰的にパース
-+で区切った最後の要素の子供に、残りの要素をパースして追加する
-
-```html
-root>aaa+bbb>(ppp+ccc>ddd+eee>fff)+ggg+hhh>iii
-<root>
-    <aaa></aaa>
-    <bbb>
-        <ppp></ppp>
-        <ccc>
-            <ddd></ddd>
-            <eee>
-                <fff></fff>
-            </eee>
-        </ccc>
-        <ggg></ggg>
-        <hhh>
-            <iii></iii>
-        </hhh>
-    </bbb>
-</root>
-```
