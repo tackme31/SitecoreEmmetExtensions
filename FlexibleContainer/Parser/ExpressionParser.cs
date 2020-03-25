@@ -22,26 +22,55 @@ namespace FlexibleContainer.Parser
         public static Node Parse(string expression)
         {
             var root = CreateNode("root");
+            var expressions = SplitExpressionAt(expression, '>');
+            root.Children = ParseInner(expressions);
             return root;
         }
 
-        private static Node ParseInner(Node parent, string expression)
+        private static List<Node> ParseInner(List<string> expressions)
         {
-            // remove outer parenthesis
-            if (expression[0] == '(' && expression[expression.Length - 1] == ')')
+            if (expressions.Count < 1)
             {
-                expression = expression.Substring(1, expression.Length - 2).Trim();
+                return new List<Node>();
             }
 
-            if (string.IsNullOrWhiteSpace(expression))
+            var firstExpression = expressions[0];
+            var firstSiblings = SplitExpressionAt(firstExpression, '+');
+            if (expressions.Count == 1 && firstSiblings.Count == 1)
             {
-                throw new FormatException($"Expression contains one or more empty nodes (Expression: {expression})");
+                return new List<Node>()
+                {
+                    CreateNode(firstSiblings[0])
+                };
             }
 
-            throw new NotImplementedException();
+            var result = new List<Node>();
+            foreach (var sibling in firstSiblings)
+            {
+                var siblingExpressions = SplitExpressionAt(TrimParenthesis(sibling), '>');
+                var nodes = ParseInner(siblingExpressions);
+                result.AddRange(nodes);
+            }
+
+            var restExpressions = expressions.GetRange(1, expressions.Count - 1);
+            if (result.Count > 0 && restExpressions.Count > 0)
+            {
+                var nodes = ParseInner(restExpressions);
+                var lastNode = result[result.Count - 1];
+                lastNode.Children = nodes;
+            }
+
+            return result;
+
+            string TrimParenthesis(string value)
+            {
+                return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
+                    ? value.Substring(1, value.Length - 2)
+                    : value;
+            }
         }
 
-        public static Node CreateNode(string node)
+        private static Node CreateNode(string node)
         {
             var tagMatch = TagRegex.Match(node);
             if (!tagMatch.Success)
@@ -55,7 +84,6 @@ namespace FlexibleContainer.Parser
                 Id = tagMatch.Groups["id"].Value,
                 ClassList = GetCaptureValues(tagMatch, "class"),
                 Attributes = GetCaptureValues(tagMatch, "attr").Select(ParseAttribute).ToDictionary(attr => attr.name, attr => attr.value),
-                Children = new List<Node>(),
                 Content = tagMatch.Groups["content"].Value,
             };
 

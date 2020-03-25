@@ -17,37 +17,62 @@ A Sitecore rendering to generate a placeholder with emmet-like syntax.
 
 - input
 ```
-div.row>h1{Hello, test}+div.col{{content}}+div{{}}
+div.row>a[href="/search"]{Search}+div.col{{content}}
 ```
 
 - output
 ```html
 <div class="row">
-    <h1>Hello, test</h1>
+    <a href="/search">Search</a>
     <div class="col">
         @Html.Sitecore().Placeholder("content")
-    </div>
-    <div>
-        @Html.Sitecore().DynamicPlaceholder()
     </div>
 </div>
 ```
 
 ---
 
+root>
+   aaa
+   +
+   bbb>
+       (ppp
+        +
+        ccc>
+           ddd
+           +
+           eee>
+               fff)
+       +
+       ggg
+       +
+       hhh>
+           iii
+
+ppp+ccc>
+ddd+eee>
+fff
+
+>で区切る
++で区切り、それぞれに対して再帰的にパース
++で区切った最後の要素の子供に、残りの要素をパースして追加する
+
 ```html
-aaa+bbb>(ccc>ddd+eee>fff)+ggg+hhh>iii
-<aaa></aaa>
-<bbb>
-    <ccc>
-        <ddd></ddd>
-        <eee>
-            <fff></fff>
-        </eee>
-    </ccc>
-    <ggg></ggg>
-    <hhh>
-        <iii></iii>
-    </hhh>
-</bbb>
+root>aaa+bbb>(ppp+ccc>ddd+eee>fff)+ggg+hhh>iii
+<root>
+    <aaa></aaa>
+    <bbb>
+        <ppp></ppp>
+        <ccc>
+            <ddd></ddd>
+            <eee>
+                <fff></fff>
+            </eee>
+        </ccc>
+        <ggg></ggg>
+        <hhh>
+            <iii></iii>
+        </hhh>
+    </bbb>
+</root>
 ```
