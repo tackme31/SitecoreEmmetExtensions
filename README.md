@@ -1,13 +1,17 @@
 # Flexible Container
-A Sitecore rendering to generate a placeholder container with emmet-like syntax.
+*Flexible Container* is a Sitecore rendering to generate a placeholder container with Emmet-like syntax.
 
-## Sample
-**Expression:**
-```
-div.row>a[href="/search"]{Search}+div.col{[container]}
-```
+**This software is in early stage of development.**
 
-**Rendered:**
+## Usage
+1. Download the package from [here](https://github.com/xirtardauq/flexible-container) and install it to Sitecore.
+1. Add the `Flexible Container` rendering (located in `Renderings/Feature/Flexible Container`) to a page layout.
+1. Set an expression to the `Expression` rendering parameter.
+
+![](./img/control-properties.png)
+
+The example expression above is rendered like the following.
+
 ```html
 <div class="row">
     <a href="/search">Search</a>
@@ -16,9 +20,6 @@ div.row>a[href="/search"]{Search}+div.col{[container]}
     </div>
 </div>
 ```
-
-## Usage
-Add a `Flexible Container` rendering to your page layout and set an expression to the `Expression` rendering parameter.
 
 ## Special Syntax
 *Flexible Container* supports a part of emmet syntax, and some special syntax is added.
@@ -39,7 +40,7 @@ div{[placeholder-key]}
 ```
 
 ### Dynamic Placeholder
-A dynamic placeholder is rendered with `{@{placeholder-key]}` syntax.
+A dynamic placeholder is rendered with `{@[placeholder-key]}` syntax.
 
 **Expression:**
 ```
@@ -68,29 +69,6 @@ div{@[placeholder-key|count:3|maxCount:10|seed:5]}
 </div>
 ```
 
-### Field interpolation (Not supported yet)
-```
-div>p{Hello {Name}}
-```
-
-```html
-<div>
-    <p>Hello @Html.Sitecore().Field("Name")</p>
-</div>
-```
-
-### Translation (Not supported yet)
-
-```
-div>h1{@(Filtering by)}
-```
-
-```html
-<div>
-    <h1>@Translate.Text("Filtering by")</h1>
-</div>
-```
-
 ## Todo List
 - [x] Nest (`div>p`)
 - [x] Class & ID (`div#id`, `a.class1.class2`)
@@ -106,6 +84,9 @@ div>h1{@(Filtering by)}
         - [x] With parameters (`div{@[key|count:3|maxCount:3|seed:5]}`)
 - [ ] Field interpolation (`h1{Title: {Title}}`)
 - [ ] Translation: (`h1{@(dictionary-key)}`)
+
+## See also
+- [Emmet — the essential toolkit for web-developers](https://emmet.io/)
 
 ## License
 *Flexible Container* is licensed unther the MIT license. See LICENSE.txt.
