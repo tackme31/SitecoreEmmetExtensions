@@ -9,7 +9,7 @@ namespace FlexibleContainer.Parser
 {
     public class ExpressionParser
     {
-        private static readonly Regex TagRegex = new Regex(
+        private static readonly Regex NodeRegex = new Regex(
             @"^" +
             @"(?<tag>\S+?)" + 
             @"(?<id>#\S+?)?" +
@@ -72,7 +72,7 @@ namespace FlexibleContainer.Parser
 
         private static Node CreateNode(string node)
         {
-            var tagMatch = TagRegex.Match(node);
+            var tagMatch = NodeRegex.Match(node);
             if (!tagMatch.Success)
             {
                 throw new FormatException($"Invalid format of the node expression (Expression: {node})");

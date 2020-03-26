@@ -9,8 +9,8 @@ namespace FlexibleContainer.Extensions
 {
     public static class SitecoreHelperExtensions
     {
-        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^{{(?<placeholderKey>[^}]*)}}$");
-        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^\{\[(?<placeholderKey>[^}|]*?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?}\]}$");
+        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>[^}]*)\]$");
+        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>[^}|]*?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?}\]$");
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
         {
@@ -23,14 +23,6 @@ namespace FlexibleContainer.Extensions
 
             string contentFormatter(string content)
             {
-                var staticPlaceholderMatch = StaticPlaceholderRegex.Match(content);
-                if (staticPlaceholderMatch.Success)
-                {
-                    var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
-                    var placeholder = helper.Placeholder(placeholderKey);
-                    return content.Replace(staticPlaceholderMatch.Value, placeholder.ToHtmlString());
-                }
-
                 var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(content);
                 if (dynamicPlaceholderMatch.Success)
                 {
@@ -48,7 +40,15 @@ namespace FlexibleContainer.Extensions
                         seed = 0;
                     }
                     var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed);
-                    return content.Replace(staticPlaceholderMatch.Value, placeholder.ToHtmlString());
+                    content = content.Replace(dynamicPlaceholderMatch.Value, placeholder.ToHtmlString());
+                }
+
+                var staticPlaceholderMatch = StaticPlaceholderRegex.Match(content);
+                if (staticPlaceholderMatch.Success)
+                {
+                    var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
+                    var placeholder = helper.Placeholder(placeholderKey);
+                    content = content.Replace(staticPlaceholderMatch.Value, placeholder.ToHtmlString());
                 }
 
                 return content;
