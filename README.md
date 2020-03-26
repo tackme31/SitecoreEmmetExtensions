@@ -4,7 +4,7 @@
 **This software is in early stage of development.**
 
 ## Usage
-1. Download the package from [here](https://github.com/xirtardauq/flexible-container) and install it to Sitecore.
+1. Download the package from [here](https://github.com/xirtardauq/flexible-container/releases) and install it to Sitecore.
 1. Add the `Flexible Container` rendering (located in `Renderings/Feature/Flexible Container`) to a page layout.
 1. Set an expression to the `Expression` rendering parameter.
 
