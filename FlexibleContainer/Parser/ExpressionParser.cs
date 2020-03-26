@@ -11,9 +11,9 @@ namespace FlexibleContainer.Parser
     {
         private static readonly Regex NodeRegex = new Regex(
             @"^" +
-            @"(?<tag>\S+?)" + 
-            @"(?<id>#\S+?)?" +
-            @"(?<class>\.\S+?){0,}" +
+            @"(?<tag>\S+?)" +
+            @"(#(?<id>\S+?))?" +
+            @"(\.(?<class>[^.\s]+?)?){0,}" +
             @"(\[((?<attr>[^=\s]+(=""[^""]*"")?)\s?){0,}\])?" +
             @"({(?<content>.+)})?" +
             @"$",

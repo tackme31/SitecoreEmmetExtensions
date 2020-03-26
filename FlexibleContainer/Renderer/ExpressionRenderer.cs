@@ -46,21 +46,24 @@ namespace FlexibleContainer.Renderer
 
                 if (!string.IsNullOrWhiteSpace(node.Id))
                 {
-                    tag.GenerateId(node.Id);
+                    tag.Attributes.Add("id", node.Id);
                 }
+
+                sb.Append(tag.ToString(TagRenderMode.StartTag));
 
                 if (!string.IsNullOrWhiteSpace(node.Content))
                 {
                     var content = contentFormatter?.Invoke(node.Content) ?? node.Content;
-                    tag.SetInnerText(content);
-                }
-                else
-                {
-                    var innerHtml = RenderInner(node.Children, contentFormatter);
-                    tag.InnerHtml = innerHtml;
+                    sb.Append(content);
                 }
 
-                sb.Append(tag.ToString(TagRenderMode.Normal));
+                if (node.Children != null)
+                {
+                    var innerHtml = RenderInner(node.Children, contentFormatter);
+                    sb.Append(innerHtml);
+                }
+
+                sb.Append(tag.ToString(TagRenderMode.EndTag));
             }
 
             return sb.ToString();

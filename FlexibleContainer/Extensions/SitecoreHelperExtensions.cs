@@ -39,16 +39,16 @@ namespace FlexibleContainer.Extensions
                     {
                         seed = 0;
                     }
-                    var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed);
-                    content = content.Replace(dynamicPlaceholderMatch.Value, placeholder.ToHtmlString());
+                    var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed).ToString();
+                    return content.Replace(dynamicPlaceholderMatch.Value, placeholder);
                 }
 
                 var staticPlaceholderMatch = StaticPlaceholderRegex.Match(content);
                 if (staticPlaceholderMatch.Success)
                 {
                     var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
-                    var placeholder = helper.Placeholder(placeholderKey);
-                    content = content.Replace(staticPlaceholderMatch.Value, placeholder.ToHtmlString());
+                    var placeholder = helper.Placeholder(placeholderKey).ToString();
+                    return content.Replace(staticPlaceholderMatch.Value, placeholder);
                 }
 
                 return content;

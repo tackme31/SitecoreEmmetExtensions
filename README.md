@@ -2,12 +2,12 @@
 A Sitecore rendering to generate a placeholder container with emmet-like syntax.
 
 ## Sample
-- Input
+**Expression:**
 ```
 div.row>a[href="/search"]{Search}+div.col{[container]}
 ```
 
-- Output
+**Rendered:**
 ```html
 <div class="row">
     <a href="/search">Search</a>
@@ -18,42 +18,57 @@ div.row>a[href="/search"]{Search}+div.col{[container]}
 ```
 
 ## Usage
+Add a `Flexible Container` rendering to your page layout and set an expression to the `Expression` rendering parameter.
 
-### Special Syntax
-Some special syntax is added.
+## Special Syntax
+*Flexible Container* supports a part of emmet syntax, and some special syntax is added.
 
-#### Static Placeholder
+### Static Placeholder
+A static placeholder is rendered with `{[placeholder-key]}` syntax at the content position.
+
+**Expression:**
 ```
 div{[placeholder-key]}
 ```
+
+**Rendered:**
 ```html
 <div>
     @Html.Sitecore().Placeholder("placeholder-key")
 </div>
 ```
 
-#### Dynamic Placeholder
+### Dynamic Placeholder
+A dynamic placeholder is rendered with `{@{placeholder-key]}` syntax.
+
+**Expression:**
 ```
 div{@[placeholder-key]}
 ```
+
+**Rendered:**
 ```html
 <div>
     @Html.Sitecore().DynamicPlaceholer("placeholder-key")
 </div>
 ```
 
-with parameters.
+\
+You can use this syntax with the `count`, `maxCount`, `seed` parameters.
 
+**Expression:**
 ```
 div{@[placeholder-key|count:3|maxCount:10|seed:5]}
 ```
+
+**Rendered:**
 ```html
 <div>
     @Html.Sitecore().DynamicPlaceholer("placeholder-key", count: 3, maxCount: 10, seed: 5)
 </div>
 ```
 
-#### Field interpolation (WIP)
+### Field interpolation (Not supported yet)
 ```
 div>p{Hello {Name}}
 ```
@@ -64,7 +79,7 @@ div>p{Hello {Name}}
 </div>
 ```
 
-#### Translation (WIP)
+### Translation (Not supported yet)
 
 ```
 div>h1{@(Filtering by)}
