@@ -11,7 +11,7 @@ namespace FlexibleContainer.Parser
     {
         private static readonly Regex NodeRegex = new Regex(
             @"^" +
-            @"(?<tag>\S+?)" +
+            @"(?<tag>\S+?)?" +
             @"(#(?<id>\S+?))?" +
             @"(\.(?<class>[^.\s]+?)?){0,}" +
             @"(\[((?<attr>[^=\s]+(=""[^""]*"")?)\s?){0,}\])?" +
@@ -78,14 +78,39 @@ namespace FlexibleContainer.Parser
                 throw new FormatException($"Invalid format of the node expression (Expression: {node})");
             }
 
-            return new Node
+            var tag = tagMatch.Groups["tag"].Value;
+            var id = tagMatch.Groups["id"].Value;
+            var classList = GetCaptureValues(tagMatch, "class");
+            var attributes = GetCaptureValues(tagMatch, "attr").Select(ParseAttribute).ToDictionary(attr => attr.name, attr => attr.value);
+            var content = tagMatch.Groups["content"].Value;
+
+            // HTML tag
+            if (!string.IsNullOrWhiteSpace(tag))
             {
-                Tag = tagMatch.Groups["tag"].Value,
-                Id = tagMatch.Groups["id"].Value,
-                ClassList = GetCaptureValues(tagMatch, "class"),
-                Attributes = GetCaptureValues(tagMatch, "attr").Select(ParseAttribute).ToDictionary(attr => attr.name, attr => attr.value),
-                Content = tagMatch.Groups["content"].Value,
-            };
+                return new Node
+                {
+                    Tag = tag,
+                    Id = id,
+                    ClassList = classList,
+                    Attributes = attributes,
+                    Content = content,
+                };
+            }
+
+            // Only text
+            if (!string.IsNullOrWhiteSpace(content) &&
+                string.IsNullOrWhiteSpace(tag) &&
+                string.IsNullOrWhiteSpace(id) &&
+                !classList.Any() && 
+                !attributes.Any())
+            {
+                return new Node()
+                {
+                    Content = content,
+                };
+            }
+
+            throw new FormatException($"Tag name is missing (Expression: {node})");
 
             ICollection<string> GetCaptureValues(Match m, string groupName)
             {

@@ -31,6 +31,13 @@ namespace FlexibleContainer.Renderer
             {
                 var tag = new TagBuilder(node.Tag);
 
+                // Text node
+                if (string.IsNullOrWhiteSpace(node.Tag))
+                {
+                    sb.Append(node.Content);
+                    continue;
+                }
+
                 if (node.Attributes != null)
                 {
                     tag.MergeAttributes(node.Attributes);
