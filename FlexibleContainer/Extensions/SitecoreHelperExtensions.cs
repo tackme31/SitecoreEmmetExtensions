@@ -9,21 +9,21 @@ namespace FlexibleContainer.Extensions
 {
     public static class SitecoreHelperExtensions
     {
-        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>[^}]*)\]$");
-        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>[^}|]*?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\]$");
+        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>.+)\]$");
+        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>.+?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\]$");
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
         {
             Assert.ArgumentNotNull(helper, nameof(helper));
 
             var parameterValue = RenderingContext.Current.Rendering.Parameters["Expression"];
-            var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div{[container]}" : parameterValue;
-            var result = ExpressionRenderer.Render(expression, contentFormatter);
+            var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div" : parameterValue;
+            var result = ExpressionRenderer.Render(expression, textFormatter);
             return new HtmlString(result);
 
-            string contentFormatter(string content)
+            string textFormatter(string text)
             {
-                var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(content);
+                var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(text);
                 if (dynamicPlaceholderMatch.Success)
                 {
                     var placeholderKey = dynamicPlaceholderMatch.Groups["placeholderKey"].Value;
@@ -40,18 +40,18 @@ namespace FlexibleContainer.Extensions
                         seed = 0;
                     }
                     var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed).ToString();
-                    return content.Replace(dynamicPlaceholderMatch.Value, placeholder);
+                    return text.Replace(dynamicPlaceholderMatch.Value, placeholder);
                 }
 
-                var staticPlaceholderMatch = StaticPlaceholderRegex.Match(content);
+                var staticPlaceholderMatch = StaticPlaceholderRegex.Match(text);
                 if (staticPlaceholderMatch.Success)
                 {
                     var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
                     var placeholder = helper.Placeholder(placeholderKey).ToString();
-                    return content.Replace(staticPlaceholderMatch.Value, placeholder);
+                    return text.Replace(staticPlaceholderMatch.Value, placeholder);
                 }
 
-                return content;
+                return text;
             }
         }
     }

@@ -11,18 +11,18 @@ namespace FlexibleContainer.Parser
     {
         private static readonly Regex NodeRegex = new Regex(
             @"^" +
-            @"(?<tag>\S+?)" +
-            @"(#(?<id>\S+?))?" +
-            @"(\.(?<class>[^.\s]+?)?){0,}" +
-            @"(\[((?<attr>[^=\s]+(=""[^""]*"")?)\s?){0,}\])?" +
-            @"({(?<content>.+)})?" +
+            @"(?<tag>[^.#{}\[\]\s]+?)?" +
+            @"(#(?<id>[^.#{}\[\]\s]+?))?" +
+            @"(\.(?<class>[^.#{}\[\]\s]+?)){0,}" +
+            @"(\[((?<attr>[^=.#{}\[\]\s]+(=""[^""]*"")?)\s?){0,}\])?" +
+            @"({(?<text>.+)})?" +
             @"$",
             RegexOptions.Compiled | RegexOptions.Singleline);
 
         public static Node Parse(string expression)
         {
             var root = CreateNode("root");
-            var expressions = SplitExpressionAt(expression, '>');
+            var expressions = SplitExpressionAt(TrimParenthesis(expression), '>');
             root.Children = ParseInner(expressions);
             return root;
         }
@@ -61,13 +61,13 @@ namespace FlexibleContainer.Parser
             }
 
             return result;
+        }
 
-            string TrimParenthesis(string value)
-            {
-                return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
-                    ? value.Substring(1, value.Length - 2)
-                    : value;
-            }
+        private static string TrimParenthesis(string value)
+        {
+            return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
+                ? value.Substring(1, value.Length - 2)
+                : value;
         }
 
         private static Node CreateNode(string node)
@@ -78,14 +78,39 @@ namespace FlexibleContainer.Parser
                 throw new FormatException($"Invalid format of the node expression (Expression: {node})");
             }
 
-            return new Node
+            var tag = tagMatch.Groups["tag"].Value;
+            var id = tagMatch.Groups["id"].Value;
+            var classList = GetCaptureValues(tagMatch, "class");
+            var attributes = GetCaptureValues(tagMatch, "attr").Select(ParseAttribute).ToDictionary(attr => attr.name, attr => attr.value);
+            var text = tagMatch.Groups["text"].Value;
+
+            // HTML tag
+            if (!string.IsNullOrWhiteSpace(tag))
             {
-                Tag = tagMatch.Groups["tag"].Value,
-                Id = tagMatch.Groups["id"].Value,
-                ClassList = GetCaptureValues(tagMatch, "class"),
-                Attributes = GetCaptureValues(tagMatch, "attr").Select(ParseAttribute).ToDictionary(attr => attr.name, attr => attr.value),
-                Content = tagMatch.Groups["content"].Value,
-            };
+                return new Node
+                {
+                    Tag = tag,
+                    Id = id,
+                    ClassList = classList,
+                    Attributes = attributes,
+                    Text = text,
+                };
+            }
+
+            // Only text
+            if (!string.IsNullOrWhiteSpace(text) &&
+                string.IsNullOrWhiteSpace(tag) &&
+                string.IsNullOrWhiteSpace(id) &&
+                !classList.Any() && 
+                !attributes.Any())
+            {
+                return new Node()
+                {
+                    Text = text,
+                };
+            }
+
+            throw new FormatException($"Tag name is missing (Expression: {node})");
 
             ICollection<string> GetCaptureValues(Match m, string groupName)
             {
@@ -109,52 +134,34 @@ namespace FlexibleContainer.Parser
             var result = new List<string>();
             var sb = new StringBuilder();
             var nest = 0;
-            var inContent = false;
+            var inText = false;
             var inAttr = false;
             foreach (var character in expression)
             {
                 // Update status
                 switch (character)
                 {
-                    case '{':
-                        if (!inContent && !inAttr)
-                        {
-                            inContent = true;
-                        }
+                    case '{' when !inText && !inAttr:
+                        inText = true;
                         break;
-                    case '}':
-                        if (inContent && !inAttr)
-                        {
-                            inContent = false;
-                        }
+                    case '}' when  inText && !inAttr:
+                        inText = false;
                         break;
-                    case '[':
-                        if (!inAttr && !inContent)
-                        {
-                            inAttr = true;
-                        }
+                    case '[' when !inText && !inAttr:
+                        inAttr = true;
                         break;
-                    case ']':
-                        if (inAttr && !inContent)
-                        {
-                            inAttr = false;
-                        }
+                    case ']' when !inText &&  inAttr:
+                        inAttr = false;
                         break;
-                    case '(':
-                        if (!inContent && !inAttr)
-                        {
-                            nest++;
-                        }
+                    case '(' when !inText && !inAttr:
+                        nest++;
                         break;
-                    case ')':
-                        if (!inContent && !inAttr)
-                        {
-                            nest--;
-                        }
+                    case ')' when !inText && !inAttr:
+                        nest--;
                         break;
                 }
 
-                if (character != delimiter || inContent || inAttr || nest > 0)
+                if (character != delimiter || inText || inAttr || nest > 0)
                 {
                     sb.Append(character);
                     continue;
