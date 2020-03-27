@@ -22,7 +22,7 @@ namespace FlexibleContainer.Parser
         public static Node Parse(string expression)
         {
             var root = CreateNode("root");
-            var expressions = SplitExpressionAt(expression, '>');
+            var expressions = SplitExpressionAt(TrimParenthesis(expression), '>');
             root.Children = ParseInner(expressions);
             return root;
         }
@@ -61,13 +61,13 @@ namespace FlexibleContainer.Parser
             }
 
             return result;
+        }
 
-            string TrimParenthesis(string value)
-            {
-                return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
-                    ? value.Substring(1, value.Length - 2)
-                    : value;
-            }
+        private static string TrimParenthesis(string value)
+        {
+            return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
+                ? value.Substring(1, value.Length - 2)
+                : value;
         }
 
         private static Node CreateNode(string node)
