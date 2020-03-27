@@ -25,7 +25,7 @@ The example expression above is rendered like the following.
 *Flexible Container* supports a part of emmet syntax, and some special syntax is added.
 
 ### Static Placeholder
-A static placeholder is rendered with `{[placeholder-key]}` syntax at the content position.
+A static placeholder is rendered with `{[placeholder-key]}` syntax at the text position.
 
 **Expression:**
 ```

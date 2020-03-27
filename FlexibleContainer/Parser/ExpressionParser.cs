@@ -15,7 +15,7 @@ namespace FlexibleContainer.Parser
             @"(#(?<id>\S+?))?" +
             @"(\.(?<class>[^.\s]+?)?){0,}" +
             @"(\[((?<attr>[^=\s]+(=""[^""]*"")?)\s?){0,}\])?" +
-            @"({(?<content>.+)})?" +
+            @"({(?<text>.+)})?" +
             @"$",
             RegexOptions.Compiled | RegexOptions.Singleline);
 
@@ -82,7 +82,7 @@ namespace FlexibleContainer.Parser
             var id = tagMatch.Groups["id"].Value;
             var classList = GetCaptureValues(tagMatch, "class");
             var attributes = GetCaptureValues(tagMatch, "attr").Select(ParseAttribute).ToDictionary(attr => attr.name, attr => attr.value);
-            var content = tagMatch.Groups["content"].Value;
+            var text = tagMatch.Groups["text"].Value;
 
             // HTML tag
             if (!string.IsNullOrWhiteSpace(tag))
@@ -93,12 +93,12 @@ namespace FlexibleContainer.Parser
                     Id = id,
                     ClassList = classList,
                     Attributes = attributes,
-                    Content = content,
+                    Text = text,
                 };
             }
 
             // Only text
-            if (!string.IsNullOrWhiteSpace(content) &&
+            if (!string.IsNullOrWhiteSpace(text) &&
                 string.IsNullOrWhiteSpace(tag) &&
                 string.IsNullOrWhiteSpace(id) &&
                 !classList.Any() && 
@@ -106,7 +106,7 @@ namespace FlexibleContainer.Parser
             {
                 return new Node()
                 {
-                    Content = content,
+                    Text = text,
                 };
             }
 
@@ -134,34 +134,34 @@ namespace FlexibleContainer.Parser
             var result = new List<string>();
             var sb = new StringBuilder();
             var nest = 0;
-            var inContent = false;
+            var inText = false;
             var inAttr = false;
             foreach (var character in expression)
             {
                 // Update status
                 switch (character)
                 {
-                    case '{' when !inContent && !inAttr:
-                        inContent = true;
+                    case '{' when !inText && !inAttr:
+                        inText = true;
                         break;
-                    case '}' when  inContent && !inAttr:
-                        inContent = false;
+                    case '}' when  inText && !inAttr:
+                        inText = false;
                         break;
-                    case '[' when !inContent && !inAttr:
+                    case '[' when !inText && !inAttr:
                         inAttr = true;
                         break;
-                    case ']' when !inContent &&  inAttr:
+                    case ']' when !inText &&  inAttr:
                         inAttr = false;
                         break;
-                    case '(' when !inContent && !inAttr:
+                    case '(' when !inText && !inAttr:
                         nest++;
                         break;
-                    case ')' when !inContent && !inAttr:
+                    case ')' when !inText && !inAttr:
                         nest--;
                         break;
                 }
 
-                if (character != delimiter || inContent || inAttr || nest > 0)
+                if (character != delimiter || inText || inAttr || nest > 0)
                 {
                     sb.Append(character);
                     continue;

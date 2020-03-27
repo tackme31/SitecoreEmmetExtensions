@@ -9,6 +9,6 @@ namespace FlexibleContainer.Parser.Models
         public ICollection<string> ClassList { get; set; }
         public IList<Node> Children { get; set; }
         public IDictionary<string, string> Attributes { get; set; }
-        public string Content { get; set; }
+        public string Text { get; set; }
     }
 }

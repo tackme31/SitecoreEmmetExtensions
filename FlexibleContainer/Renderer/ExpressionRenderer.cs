@@ -11,15 +11,15 @@ namespace FlexibleContainer.Renderer
 {
     public static class ExpressionRenderer
     {
-        public static string Render(string expression, Func<string, string> contentFormatter = null)
+        public static string Render(string expression, Func<string, string> textFormatter = null)
         {
             Assert.ArgumentNotNullOrEmpty(expression, nameof(expression));
 
             var rootNode = ExpressionParser.Parse(expression);
-            return RenderInner(rootNode.Children, contentFormatter); 
+            return RenderInner(rootNode.Children, textFormatter); 
         }
 
-        private static string RenderInner(IList<Node> nodes, Func<string, string> contentFormatter = null)
+        private static string RenderInner(IList<Node> nodes, Func<string, string> textFormatter = null)
         {
             if (nodes == null || !nodes.Any())
             {
@@ -34,7 +34,7 @@ namespace FlexibleContainer.Renderer
                 // Text node
                 if (string.IsNullOrWhiteSpace(node.Tag))
                 {
-                    sb.Append(node.Content);
+                    sb.Append(node.Text);
                     continue;
                 }
 
@@ -58,15 +58,15 @@ namespace FlexibleContainer.Renderer
 
                 sb.Append(tag.ToString(TagRenderMode.StartTag));
 
-                if (!string.IsNullOrWhiteSpace(node.Content))
+                if (!string.IsNullOrWhiteSpace(node.Text))
                 {
-                    var content = contentFormatter?.Invoke(node.Content) ?? node.Content;
-                    sb.Append(content);
+                    var text = textFormatter?.Invoke(node.Text) ?? node.Text;
+                    sb.Append(text);
                 }
 
                 if (node.Children != null)
                 {
-                    var innerHtml = RenderInner(node.Children, contentFormatter);
+                    var innerHtml = RenderInner(node.Children, textFormatter);
                     sb.Append(innerHtml);
                 }
 
