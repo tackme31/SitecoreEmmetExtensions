@@ -176,6 +176,11 @@ namespace FlexibleContainer.Parser
                 result.Add(sb.ToString());
             }
 
+            if (result.Any(exp => exp.Length == 0))
+            {
+                throw new FormatException($"An empty node is contained in the expression (Expression: {expression})");
+            }
+
             if (nest < 0)
             {
                 throw new FormatException($"Too much open parenthesis (Expression: {expression})");
