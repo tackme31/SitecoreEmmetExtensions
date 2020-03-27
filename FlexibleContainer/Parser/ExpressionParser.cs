@@ -35,7 +35,7 @@ namespace FlexibleContainer.Parser
             }
 
             var firstExpression = expressions[0];
-            var firstSiblings = SplitExpressionAt(firstExpression, '+');
+            var firstSiblings = SplitExpressionAt(TrimParenthesis(firstExpression), '+');
             if (expressions.Count == 1 && firstSiblings.Count == 1)
             {
                 return new List<Node>()
@@ -174,6 +174,11 @@ namespace FlexibleContainer.Parser
             if (sb.Length > 0)
             {
                 result.Add(sb.ToString());
+            }
+
+            if (result.Any(exp => exp.Length == 0))
+            {
+                throw new FormatException($"An empty node is contained in the expression (Expression: {expression})");
             }
 
             if (nest < 0)
