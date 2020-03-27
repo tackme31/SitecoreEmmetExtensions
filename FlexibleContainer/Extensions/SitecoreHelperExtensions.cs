@@ -17,7 +17,7 @@ namespace FlexibleContainer.Extensions
             Assert.ArgumentNotNull(helper, nameof(helper));
 
             var parameterValue = RenderingContext.Current.Rendering.Parameters["Expression"];
-            var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div{@[content]}" : parameterValue;
+            var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div" : parameterValue;
             var result = ExpressionRenderer.Render(expression, textFormatter);
             return new HtmlString(result);
 
