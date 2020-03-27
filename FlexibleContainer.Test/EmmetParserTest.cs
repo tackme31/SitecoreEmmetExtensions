@@ -196,6 +196,49 @@ namespace FlexibleContainer.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Text_WithoutTagWithId_ShouldFormatError()
+        {
+            ExpressionRenderer.Render("#id{text}");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Text_WithoutTagWithClass_ShouldFormatError()
+        {
+            ExpressionRenderer.Render(".class{text}");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Text_WithoutTagWithAttribute_ShouldFormatError()
+        {
+            ExpressionRenderer.Render("[attr=\"value\"]{text}");
+        }
+
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Node_InvaidAttributesOrder1_ShouldFormatError()
+        {
+            ExpressionRenderer.Render("div.class#id");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Node_InvaidAttributesOrder2_ShouldFormatError()
+        {
+            ExpressionRenderer.Render("div[attr=\"value\"]#id");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Node_InvaidAttributesOrder3_ShouldFormatError()
+        {
+            ExpressionRenderer.Render("div[attr=\"value\"].class");
+        }
+
+        [TestMethod]
         public void ComplexPattern1_CanParse()
         {
             var expected = "<div attr1=\"value1\" attr2=\"\" class=\"class2 class1\" id=\"id\">text</div>";
