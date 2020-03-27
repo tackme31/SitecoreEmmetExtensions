@@ -116,41 +116,23 @@ namespace FlexibleContainer.Parser
                 // Update status
                 switch (character)
                 {
-                    case '{':
-                        if (!inContent && !inAttr)
-                        {
-                            inContent = true;
-                        }
+                    case '{' when !inContent && !inAttr:
+                        inContent = true;
                         break;
-                    case '}':
-                        if (inContent && !inAttr)
-                        {
-                            inContent = false;
-                        }
+                    case '}' when  inContent && !inAttr:
+                        inContent = false;
                         break;
-                    case '[':
-                        if (!inAttr && !inContent)
-                        {
-                            inAttr = true;
-                        }
+                    case '[' when !inContent && !inAttr:
+                        inAttr = true;
                         break;
-                    case ']':
-                        if (inAttr && !inContent)
-                        {
-                            inAttr = false;
-                        }
+                    case ']' when !inContent &&  inAttr:
+                        inAttr = false;
                         break;
-                    case '(':
-                        if (!inContent && !inAttr)
-                        {
-                            nest++;
-                        }
+                    case '(' when !inContent && !inAttr:
+                        nest++;
                         break;
-                    case ')':
-                        if (!inContent && !inAttr)
-                        {
-                            nest--;
-                        }
+                    case ')' when !inContent && !inAttr:
+                        nest--;
                         break;
                 }
 
