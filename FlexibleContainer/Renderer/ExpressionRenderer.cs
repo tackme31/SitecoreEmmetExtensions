@@ -11,6 +11,8 @@ namespace FlexibleContainer.Renderer
 {
     public static class ExpressionRenderer
     {
+        private static readonly HashSet<string> NoEndTags = new HashSet<string> { "br", "hr", "img", "input", "meta", "area", "base", "col", "embed", "keygen", "link", "param", "source" };
+
         public static string Render(string expression, Func<string, string> textFormatter = null)
         {
             Assert.ArgumentNotNullOrEmpty(expression, nameof(expression));
@@ -74,7 +76,10 @@ namespace FlexibleContainer.Renderer
                     sb.Append(innerHtml);
                 }
 
-                sb.Append(tag.ToString(TagRenderMode.EndTag));
+                if (!NoEndTags.Contains(node.Tag.ToLower()))
+                {
+                    sb.Append(tag.ToString(TagRenderMode.EndTag));
+                }
             }
 
             return sb.ToString();

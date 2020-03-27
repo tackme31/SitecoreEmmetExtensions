@@ -166,7 +166,7 @@ namespace FlexibleContainer.Test
         [TestMethod]
         public void Attributes_Multiple_CanParse()
         {
-            var expected = "<input checked=\" \"type=\"checkbox\">";
+            var expected = "<input checked=\"\" type=\"checkbox\">";
             var actual = ExpressionRenderer.Render("input[type=\"checkbox\" checked]");
             Assert.AreEqual(expected, actual);
         }
