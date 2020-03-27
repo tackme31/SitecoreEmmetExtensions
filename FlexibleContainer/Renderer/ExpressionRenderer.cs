@@ -29,14 +29,18 @@ namespace FlexibleContainer.Renderer
             var sb = new StringBuilder();
             foreach (var node in nodes)
             {
-                var tag = new TagBuilder(node.Tag);
-
                 // Text node
                 if (string.IsNullOrWhiteSpace(node.Tag))
                 {
-                    sb.Append(node.Text);
+                    var text = textFormatter?.Invoke(node.Text) ?? node.Text;
+                    sb.Append(text);
+
+                    var innerHtml = RenderInner(node.Children, textFormatter);
+                    sb.Append(innerHtml);
                     continue;
                 }
+
+                var tag = new TagBuilder(node.Tag);
 
                 if (node.Attributes != null)
                 {

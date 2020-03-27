@@ -11,10 +11,10 @@ namespace FlexibleContainer.Parser
     {
         private static readonly Regex NodeRegex = new Regex(
             @"^" +
-            @"(?<tag>\S+?)?" +
-            @"(#(?<id>\S+?))?" +
-            @"(\.(?<class>[^.\s]+?)?){0,}" +
-            @"(\[((?<attr>[^=\s]+(=""[^""]*"")?)\s?){0,}\])?" +
+            @"(?<tag>[^.#{}\[\]\s]+?)?" +
+            @"(#(?<id>[^.#{}\[\]\s]+?))?" +
+            @"(\.(?<class>[^.#{}\[\]\s]+?)){0,}" +
+            @"(\[((?<attr>[^=.#{}\[\]\s]+(=""[^""]*"")?)\s?){0,}\])?" +
             @"({(?<text>.+)})?" +
             @"$",
             RegexOptions.Compiled | RegexOptions.Singleline);

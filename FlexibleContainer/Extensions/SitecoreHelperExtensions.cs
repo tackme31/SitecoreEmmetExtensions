@@ -9,8 +9,8 @@ namespace FlexibleContainer.Extensions
 {
     public static class SitecoreHelperExtensions
     {
-        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>[^}]*)\]$");
-        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>[^}|]*?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\]$");
+        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>.+)\]$");
+        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>.+?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\]$");
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
         {
