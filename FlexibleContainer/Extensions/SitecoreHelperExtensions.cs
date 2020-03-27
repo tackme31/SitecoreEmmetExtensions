@@ -9,6 +9,7 @@ namespace FlexibleContainer.Extensions
 {
     public static class SitecoreHelperExtensions
     {
+        private static readonly Regex FieldRegex = new Regex(@"{(?<fieldName>[^}]+)}");
         private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>.+)\]$");
         private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>.+?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\]$");
 
@@ -23,6 +24,13 @@ namespace FlexibleContainer.Extensions
 
             string textFormatter(string text)
             {
+                var fieldMatches = FieldRegex.Matches(text);
+                foreach (Match fieldMatch in fieldMatches)
+                {
+                    var field = helper.Field(fieldMatch.Value).ToString();
+                    text = text.Replace(fieldMatch.Value, field);
+                }
+
                 var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(text);
                 if (dynamicPlaceholderMatch.Success)
                 {
