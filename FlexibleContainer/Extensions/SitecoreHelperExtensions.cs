@@ -9,9 +9,9 @@ namespace FlexibleContainer.Extensions
 {
     public static class SitecoreHelperExtensions
     {
-        private static readonly Regex FieldRegex = new Regex(@"{(?<fieldName>[^}]+)}");
-        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>.+)\]$");
-        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>.+?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\]$");
+        private static readonly Regex FieldRegex = new Regex(@"(?<!{){(?<fieldName>[^}]+)}(?!})");
+        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^(?<!\[)\[(?<placeholderKey>.+)\](?!])$");
+        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@(?<!\[)\[(?<placeholderKey>.+?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\](?!])$");
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
         {
@@ -24,6 +24,7 @@ namespace FlexibleContainer.Extensions
 
             string textFormatter(string text)
             {
+                // Field interpolation
                 var fieldMatches = FieldRegex.Matches(text);
                 foreach (Match fieldMatch in fieldMatches)
                 {
@@ -31,6 +32,7 @@ namespace FlexibleContainer.Extensions
                     text = text.Replace(fieldMatch.Value, field);
                 }
 
+                // Dynamic placeholder
                 var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(text);
                 if (dynamicPlaceholderMatch.Success)
                 {
@@ -48,18 +50,23 @@ namespace FlexibleContainer.Extensions
                         seed = 0;
                     }
                     var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed).ToString();
-                    return text.Replace(dynamicPlaceholderMatch.Value, placeholder);
+                    text.Replace(dynamicPlaceholderMatch.Value, placeholder);
                 }
 
+                // Static placeholder
                 var staticPlaceholderMatch = StaticPlaceholderRegex.Match(text);
                 if (staticPlaceholderMatch.Success)
                 {
                     var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
                     var placeholder = helper.Placeholder(placeholderKey).ToString();
-                    return text.Replace(staticPlaceholderMatch.Value, placeholder);
+                    text.Replace(staticPlaceholderMatch.Value, placeholder);
                 }
 
-                return text;
+                return text
+                    .Replace("[[", "[")
+                    .Replace("]]", "]")
+                    .Replace("{{", "{")
+                    .Replace("}}", "}");
             }
         }
     }
