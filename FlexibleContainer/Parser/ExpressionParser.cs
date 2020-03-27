@@ -35,7 +35,7 @@ namespace FlexibleContainer.Parser
             }
 
             var firstExpression = expressions[0];
-            var firstSiblings = SplitExpressionAt(firstExpression, '+');
+            var firstSiblings = SplitExpressionAt(TrimParenthesis(firstExpression), '+');
             if (expressions.Count == 1 && firstSiblings.Count == 1)
             {
                 return new List<Node>()
