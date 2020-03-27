@@ -69,24 +69,28 @@ div{@[placeholder-key|count:3|maxCount:10|seed:5]}
 </div>
 ```
 
-## Todo List
-- [x] Nest (`div>p`)
-- [x] Class & ID (`div#id`, `a.class1.class2`)
-- [x] Attributes (`input[type="checkbox" checked]`)
-- [x] Content (`a{Content}`)
+## Supported Syntax
+- [x] Child (`div>p`)
 - [x] Sibling (`p+p`)
+- [ ] Climb-up (`p>em^bq`)
+- [ ] Multiplication (`li*5`)
 - [x] Grouping (`p+(div>h1)+p>a`)
-- [ ] Iteration (`a*5`)
-	- [ ] Iterate counter `p*5>a{text $}`
+- [x] ID & Class (`div#id`, `a.class1.class2`)
+- [x] Custom attributes (`input[type="checkbox" checked]`)
+- [ ] Item numbering (`ul>li.item$*5`)
+    - Changing direction (`ul>li.item$@-*5`)
+    - Changing base (`ul>li.item$@3*5`)
+- [x] Text (`a{Content}`)
+    - Without tag (`{Click }+a{here}`)
 - [x] Placeholder
 	- [x] Static (`div{[place-holder-key]}`)
 	- [x] Dynamic (`div{@[place-holder-key]}`)
         - [x] With parameters (`div{@[key|count:3|maxCount:3|seed:5]}`)
-- [ ] Field interpolation (`h1{Title: {Title}}`)
-- [ ] Translation: (`h1{@(dictionary-key)}`)
+- [ ] Field interpolation (WIP)
+- [ ] Translation (WIP)
 
 ## See also
-- [Emmet — the essential toolkit for web-developers](https://emmet.io/)
+- [Emmet &#8212; the essential toolkit for web-developers](https://emmet.io/)
 
 ## License
 *Flexible Container* is licensed unther the MIT license. See LICENSE.txt.
