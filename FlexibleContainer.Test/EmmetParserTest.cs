@@ -344,5 +344,44 @@ namespace FlexibleContainer.Test
             var actual = ExpressionRenderer.Render("p{$$$ $$ $$$$ $}*2");
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        public void Numbering_Direction_CanParse()
+        {
+            var expected =
+                "<p>5</p>" +
+                "<p>4</p>" +
+                "<p>3</p>" +
+                "<p>2</p>" +
+                "<p>1</p>";
+            var actual = ExpressionRenderer.Render("p{$@-}*5");
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Numbering_Base_CanParse()
+        {
+            var expected =
+                "<p>3</p>" +
+                "<p>4</p>" +
+                "<p>5</p>" +
+                "<p>6</p>" +
+                "<p>7</p>";
+            var actual = ExpressionRenderer.Render("p{$@3}*5");
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Numbering_DirectionWithBase_CanParse()
+        {
+            var expected =
+                "<p>7</p>" +
+                "<p>6</p>" +
+                "<p>5</p>" +
+                "<p>4</p>" +
+                "<p>3</p>";
+            var actual = ExpressionRenderer.Render("p{$@-3}*5");
+            Assert.AreEqual(expected, actual);
+        }
     }
 }
