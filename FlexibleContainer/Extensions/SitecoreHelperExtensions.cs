@@ -63,7 +63,7 @@ namespace FlexibleContainer.Extensions
                         seed = 0;
                     }
                     var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed).ToString();
-                    text.Replace(dynamicPlaceholderMatch.Value, placeholder);
+                    text = DynamicPlaceholderRegex.Replace(text, placeholder);
                 }
 
                 // Static placeholder
@@ -72,7 +72,7 @@ namespace FlexibleContainer.Extensions
                 {
                     var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
                     var placeholder = helper.Placeholder(placeholderKey).ToString();
-                    text.Replace(staticPlaceholderMatch.Value, placeholder);
+                    text = StaticPlaceholderRegex.Replace(text, placeholder);
                 }
 
                 return text
