@@ -9,6 +9,10 @@ namespace FlexibleContainer.Parser
 {
     public class ExpressionParser
     {
+        private static readonly Regex MultiplicationRegex = new Regex(@"\*(?<multiplier>[1-9]\d*)$", RegexOptions.Compiled | RegexOptions.Singleline);
+
+        private static readonly Regex NumberingRegex = new Regex(@"(?<numbering>\$+)", RegexOptions.Compiled | RegexOptions.Singleline);
+
         private static readonly Regex NodeRegex = new Regex(
             @"^" +
             @"(?<tag>[^.#{}\[\]\s]+?)?" +
@@ -36,7 +40,7 @@ namespace FlexibleContainer.Parser
 
             var firstExpression = expressions[0];
             var firstSiblings = SplitExpressionAt(firstExpression, '+');
-            if (expressions.Count == 1 && firstSiblings.Count == 1)
+            if (!MultiplicationRegex.IsMatch(firstExpression) && expressions.Count == 1 && firstSiblings.Count == 1)
             {
                 return new List<Node>()
                 {
@@ -47,9 +51,24 @@ namespace FlexibleContainer.Parser
             var result = new List<Node>();
             foreach (var sibling in firstSiblings)
             {
-                var siblingExpressions = SplitExpressionAt(sibling, '>');
+                // Get multiplication data
+                var siblingBody = sibling;
+                var multiplier = 1;
+                var multiplicationMatch = MultiplicationRegex.Match(sibling);
+                if (multiplicationMatch.Success)
+                {
+                    siblingBody = MultiplicationRegex.Replace(sibling, string.Empty);
+                    multiplier = int.Parse(multiplicationMatch.Groups["multiplier"].Value);
+                }
+
+                var siblingExpressions = SplitExpressionAt(TrimParenthesis(siblingBody), '>');
                 var nodes = ParseInner(siblingExpressions);
-                result.AddRange(nodes);
+
+                // Multiply nodes
+                for (var i = 1; i <= multiplier; i++)
+                {
+                    result.AddRange(nodes);
+                }
             }
 
             var restExpressions = expressions.GetRange(1, expressions.Count - 1);
