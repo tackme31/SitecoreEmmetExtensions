@@ -1,4 +1,5 @@
 ﻿using FlexibleContainer.Renderer;
+using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Helpers;
 using Sitecore.Mvc.Presentation;
@@ -10,7 +11,7 @@ namespace FlexibleContainer.Extensions
     public static class SitecoreHelperExtensions
     {
         private static readonly Regex FieldRegex = new Regex(
-            @"(?<!\\){(?<fieldName>[^}]+)(?<!\\)}",
+            @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(?<!\\)}",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
@@ -47,7 +48,8 @@ namespace FlexibleContainer.Extensions
                         continue;
                     }
 
-                    var field = helper.Field(fieldName).ToString();
+                    var editable = MainUtil.GetBool(fieldMatch.Groups["editable"].Value, true);
+                    var field = helper.Field(fieldName, new { DisableWebEdit = !editable }).ToString();
                     text = text.Replace(fieldMatch.Value, field);
                 }
 
