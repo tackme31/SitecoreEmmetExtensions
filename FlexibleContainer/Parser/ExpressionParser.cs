@@ -9,6 +9,10 @@ namespace FlexibleContainer.Parser
 {
     public class ExpressionParser
     {
+        private static readonly Regex MultiplicationRegex = new Regex(@"\*(?<multiplier>[1-9]\d*)$", RegexOptions.Compiled | RegexOptions.Singleline);
+
+        private static readonly Regex NumberingRegex = new Regex(@"(?<numbering>\$+)(@(?<direction>-)?(?<base>[1-9]\d*)?)?", RegexOptions.Compiled | RegexOptions.Singleline);
+
         private static readonly Regex NodeRegex = new Regex(
             @"^" +
             @"(?<tag>[^.#{}\[\]\s]+?)?" +
@@ -36,7 +40,7 @@ namespace FlexibleContainer.Parser
 
             var firstExpression = expressions[0];
             var firstSiblings = SplitExpressionAt(firstExpression, '+');
-            if (expressions.Count == 1 && firstSiblings.Count == 1)
+            if (!MultiplicationRegex.IsMatch(firstExpression) && expressions.Count == 1 && firstSiblings.Count == 1)
             {
                 return new List<Node>()
                 {
@@ -45,29 +49,71 @@ namespace FlexibleContainer.Parser
             }
 
             var result = new List<Node>();
+            var lastNodeMultiplir = 1;
             foreach (var sibling in firstSiblings)
             {
-                var siblingExpressions = SplitExpressionAt(sibling, '>');
-                var nodes = ParseInner(siblingExpressions);
-                result.AddRange(nodes);
+                // Get multiplication data
+                var siblingBody = sibling;
+                var multiplier = 1;
+                var multiplicationMatch = MultiplicationRegex.Match(sibling);
+                if (multiplicationMatch.Success)
+                {
+                    siblingBody = MultiplicationRegex.Replace(sibling, string.Empty);
+                    multiplier = int.Parse(multiplicationMatch.Groups["multiplier"].Value);
+                }
+
+                // Multiply nodes
+                for (var i = 1; i <= multiplier; i++)
+                {
+                    var numberedBody = ReplaceNumberings(siblingBody, i, multiplier);
+                    var siblingExpressions = SplitExpressionAt(numberedBody, '>');
+                    var nodes = ParseInner(siblingExpressions);
+                    result.AddRange(nodes);
+                }
+
+                lastNodeMultiplir = multiplier;
             }
 
             var restExpressions = expressions.GetRange(1, expressions.Count - 1);
             if (result.Count > 0 && restExpressions.Count > 0)
             {
                 var nodes = ParseInner(restExpressions);
-                var lastNode = result[result.Count - 1];
-                lastNode.Children = nodes;
+                var lastNodes = result.GetRange(result.Count - lastNodeMultiplir, lastNodeMultiplir);
+
+                // When the last node is multiplied, set its children to each node.
+                foreach (var lastNode in lastNodes)
+                {
+                    lastNode.Children = nodes;
+                }
             }
 
             return result;
         }
 
-        private static string TrimParenthesis(string value)
+        private static string ReplaceNumberings(string expression, int index, int multiplier)
         {
-            return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
-                ? value.Substring(1, value.Length - 2)
-                : value;
+            var numberingMatches = NumberingRegex
+                .Matches(expression)
+                .OfType<Match>()
+                .OrderByDescending(m => m.Groups["numbering"].Value.Length);
+            foreach (var numberingMatch in numberingMatches)
+            {
+                var numbering = numberingMatch.Groups["numbering"].Value;
+                var direction = numberingMatch.Groups["direction"].Value;
+                if (!int.TryParse(numberingMatch.Groups["base"].Value, out var @base))
+                {
+                    @base = 1;
+                }
+
+                var n = string.IsNullOrEmpty(direction)
+                    ? index + @base - 1
+                    : multiplier + @base - index;
+
+                var numbers = n.ToString().PadLeft(numbering.Length, '0');
+                expression = expression.Replace(numberingMatch.Value, numbers);
+            }
+
+            return expression;
         }
 
         private static Node CreateNode(string node)
@@ -192,6 +238,13 @@ namespace FlexibleContainer.Parser
             }
 
             return result;
+
+            string TrimParenthesis(string value)
+            {
+                return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
+                    ? value.Substring(1, value.Length - 2)
+                    : value;
+            }
         }
     }
 }
