@@ -49,6 +49,7 @@ namespace FlexibleContainer.Parser
             }
 
             var result = new List<Node>();
+            var lastNodeMultiplir = 1;
             foreach (var sibling in firstSiblings)
             {
                 // Get multiplication data
@@ -61,22 +62,28 @@ namespace FlexibleContainer.Parser
                     multiplier = int.Parse(multiplicationMatch.Groups["multiplier"].Value);
                 }
 
-                var siblingExpressions = SplitExpressionAt(TrimParenthesis(siblingBody), '>');
-                var nodes = ParseInner(siblingExpressions);
-
                 // Multiply nodes
                 for (var i = 1; i <= multiplier; i++)
                 {
+                    var siblingExpressions = SplitExpressionAt(TrimParenthesis(siblingBody), '>');
+                    var nodes = ParseInner(siblingExpressions);
                     result.AddRange(nodes);
                 }
+
+                lastNodeMultiplir = multiplier;
             }
 
             var restExpressions = expressions.GetRange(1, expressions.Count - 1);
             if (result.Count > 0 && restExpressions.Count > 0)
             {
                 var nodes = ParseInner(restExpressions);
-                var lastNode = result[result.Count - 1];
-                lastNode.Children = nodes;
+                var lastNodes = result.GetRange(result.Count - lastNodeMultiplir, lastNodeMultiplir);
+
+                // When the last node is multiplied, set its children to each node.
+                foreach (var lastNode in lastNodes)
+                {
+                    lastNode.Children = nodes;
+                }
             }
 
             return result;
