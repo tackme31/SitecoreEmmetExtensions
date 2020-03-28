@@ -1,4 +1,5 @@
 ﻿using FlexibleContainer.Renderer;
+using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Helpers;
 using Sitecore.Mvc.Presentation;
@@ -9,8 +10,22 @@ namespace FlexibleContainer.Extensions
 {
     public static class SitecoreHelperExtensions
     {
-        private static readonly Regex StaticPlaceholderRegex = new Regex(@"^\[(?<placeholderKey>.+)\]$");
-        private static readonly Regex DynamicPlaceholderRegex = new Regex(@"^@\[(?<placeholderKey>.+?)(\|count:(?<count>\d+?))?(\|maxCount:(?<maxCount>\d+?))?(\|seed:(?<seed>\d+?))?\]$");
+        private static readonly Regex FieldRegex = new Regex(
+            @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(?<!\\)}",
+            RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private static readonly Regex StaticPlaceholderRegex = new Regex(
+            @"^(?<!\\)\[(?<placeholderKey>.+)(?<!\\)\]$",
+            RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private static readonly Regex DynamicPlaceholderRegex = new Regex(
+            @"^@(?<!\\)\[" +
+            @"(?<placeholderKey>.+?)" +
+            @"(\|count:(?<count>\d+?))?" +
+            @"(\|maxCount:(?<maxCount>\d+?))?" +
+            @"(\|seed:(?<seed>\d+?))?" +
+            @"(?<!\\)\]$",
+            RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
         {
@@ -23,6 +38,22 @@ namespace FlexibleContainer.Extensions
 
             string textFormatter(string text)
             {
+                // Field interpolation
+                var fieldMatches = FieldRegex.Matches(text);
+                foreach (Match fieldMatch in fieldMatches)
+                {
+                    var fieldName = fieldMatch.Groups["fieldName"].Value;
+                    if (string.IsNullOrWhiteSpace(fieldName))
+                    {
+                        continue;
+                    }
+
+                    var editable = MainUtil.GetBool(fieldMatch.Groups["editable"].Value, true);
+                    var field = helper.Field(fieldName, new { DisableWebEdit = !editable }).ToString();
+                    text = text.Replace(fieldMatch.Value, field);
+                }
+
+                // Dynamic placeholder
                 var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(text);
                 if (dynamicPlaceholderMatch.Success)
                 {
@@ -40,18 +71,24 @@ namespace FlexibleContainer.Extensions
                         seed = 0;
                     }
                     var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed).ToString();
-                    return text.Replace(dynamicPlaceholderMatch.Value, placeholder);
+                    text = DynamicPlaceholderRegex.Replace(text, placeholder);
                 }
 
+                // Static placeholder
                 var staticPlaceholderMatch = StaticPlaceholderRegex.Match(text);
                 if (staticPlaceholderMatch.Success)
                 {
                     var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
                     var placeholder = helper.Placeholder(placeholderKey).ToString();
-                    return text.Replace(staticPlaceholderMatch.Value, placeholder);
+                    text = StaticPlaceholderRegex.Replace(text, placeholder);
                 }
 
-                return text;
+                return text
+                    .Replace("\\[", "[")
+                    .Replace("\\]", "]")
+                    .Replace("\\{", "{")
+                    .Replace("\\}", "}")
+                    .Replace("\\\\", "\\");
             }
         }
     }
