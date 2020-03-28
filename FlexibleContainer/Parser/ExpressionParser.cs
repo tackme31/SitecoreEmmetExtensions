@@ -11,7 +11,7 @@ namespace FlexibleContainer.Parser
     {
         private static readonly Regex MultiplicationRegex = new Regex(@"\*(?<multiplier>[1-9]\d*)$", RegexOptions.Compiled | RegexOptions.Singleline);
 
-        private static readonly Regex NumberingRegex = new Regex(@"(?<numbering>\$+)", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex NumberingRegex = new Regex(@"(?<numbering>\$+)(@(?<direction>-)?(?<base>[1-9]\d*)?)?", RegexOptions.Compiled | RegexOptions.Singleline);
 
         private static readonly Regex NodeRegex = new Regex(
             @"^" +
@@ -65,7 +65,7 @@ namespace FlexibleContainer.Parser
                 // Multiply nodes
                 for (var i = 1; i <= multiplier; i++)
                 {
-                    var numberedBody = ReplaceNumberings(siblingBody, i);
+                    var numberedBody = ReplaceNumberings(siblingBody, i, multiplier);
                     var siblingExpressions = SplitExpressionAt(numberedBody, '>');
                     var nodes = ParseInner(siblingExpressions);
                     result.AddRange(nodes);
@@ -90,7 +90,7 @@ namespace FlexibleContainer.Parser
             return result;
         }
 
-        private static string ReplaceNumberings(string expression, int number)
+        private static string ReplaceNumberings(string expression, int index, int multiplier)
         {
             var numberingMatches = NumberingRegex
                 .Matches(expression)
@@ -99,8 +99,18 @@ namespace FlexibleContainer.Parser
             foreach (var numberingMatch in numberingMatches)
             {
                 var numbering = numberingMatch.Groups["numbering"].Value;
-                var numbers = number.ToString().PadLeft(numbering.Length, '0');
-                expression = expression.Replace(numbering, numbers);
+                var direction = numberingMatch.Groups["direction"].Value;
+                if (!int.TryParse(numberingMatch.Groups["base"].Value, out var @base))
+                {
+                    @base = 1;
+                }
+
+                var n = string.IsNullOrEmpty(direction)
+                    ? index + @base - 1
+                    : multiplier + @base - index;
+
+                var numbers = n.ToString().PadLeft(numbering.Length, '0');
+                expression = expression.Replace(numberingMatch.Value, numbers);
             }
 
             return expression;
