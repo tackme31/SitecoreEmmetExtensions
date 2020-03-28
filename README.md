@@ -22,11 +22,15 @@ The example expression above is rendered like the following.
 ```
 
 ## Special Syntax
-*Flexible Container* supports [a part of emmet syntax](https://github.com/xirtardauq/EmmetSharp), and some special syntax is added.
+In the *Flexible Container*, the following syntax can be used in addition to [the Emmet syntax](https://github.com/xirtardauq/EmmetSharp).
 
+- [Static Placeholder](#user-content-static-placeholder)
+- [Dynamic Placeholder](#user-content-dynamic-placeholder)
+- [Field Interpolation](#user-content-field-interpolation)
+- [Translation](#user-content-translation)
 
 ### Static Placeholder
-A static placeholder is rendered with `{[placeholder-key]}` syntax at the text position.
+The static placeholder is rendered with `{[placeholder-key]}` syntax at the text position.
 
 **Expression:**
 ```
@@ -40,8 +44,11 @@ div{[placeholder-key]}
 </div>
 ```
 
+**NOTE:**
+Using this syntax within the text is not allowed (ex: `div{foo[ph-within-text]bar}`).
+
 ### Dynamic Placeholder
-A dynamic placeholder is rendered with `{@[placeholder-key]}` syntax.
+The dynamic placeholder is similar to the static one: `{@[placeholder-key]}`.
 
 **Expression:**
 ```
@@ -58,7 +65,7 @@ div{@[placeholder-key]}
 You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxcount:5|seed:10]}`
 
 ### Field Interpolation
-To display a field value, use `{field name}` syntax in the text part.
+To display a field value, use the `{field name}` syntax in the text part.
 
 **Expression:**
 ```
@@ -73,7 +80,7 @@ p{Value is: {Title}}
 You can use the `editable` parameter for specifying enable/disable editing (ex: `{Title|editable:false}`).
 
 ### Translation
-The `@(dictionary key)` syntax allows you to translate a text with the `Translate.Text`.
+The `@(dictionary-key)` syntax allows you to translate a text with the `Translate.Text`.
 
 
 **Expression:**
