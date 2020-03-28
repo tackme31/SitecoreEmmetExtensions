@@ -55,39 +55,56 @@ div{@[placeholder-key]}
 ```
 
 \
-You can use this syntax with the `count`, `maxCount`, `seed` parameters.
+You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxcount:5|seed:10]}`
+
+### Field Interpolation
+To display a field value, use `{field name}` syntax in the text part.
 
 **Expression:**
 ```
-div{@[placeholder-key|count:3|maxCount:10|seed:5]}
+p{Value is: {Title}}
 ```
 
 **Rendered:**
 ```html
-<div>
-    @Html.Sitecore().DynamicPlaceholer("placeholder-key", count: 3, maxCount: 10, seed: 5)
-</div>
+<p>Value is @Html.Sitecore().Field("Title")</p>
+```
+
+You can use the `editable` parameter for specifying enable/disable editing (ex: `{Title|editable:false}`).
+
+### Translation
+The `@(dictionary key)` syntax allows you to translate a text with the `Translate.Text`.
+
+
+**Expression:**
+```
+h1{@(Title)}
+```
+
+**Rendered:**
+```html
+<h1>@Translate.Text("Title")</h1>
 ```
 
 ## Supported Syntax
 - [x] Child (`div>p`)
 - [x] Sibling (`p+p`)
 - [ ] Climb-up (`p>em^bq`)
-- [ ] Multiplication (`li*5`)
+- [x] Multiplication (`li*5`)
 - [x] Grouping (`p+(div>h1)+p>a`)
 - [x] ID & Class (`div#id`, `a.class1.class2`)
 - [x] Custom attributes (`input[type="checkbox" checked]`)
-- [ ] Item numbering (`ul>li.item$*5`)
-    - Changing direction (`ul>li.item$@-*5`)
-    - Changing base (`ul>li.item$@3*5`)
+- [x] Item numbering (`ul>li.item$*5`)
+    - [x] Changing direction (`ul>li.item$@-*5`)
+    - [x] Changing base (`ul>li.item$@3*5`)
 - [x] Text (`a{Content}`)
     - Without tag (`{Click }+a{here}`)
 - [x] Placeholder
 	- [x] Static (`div{[place-holder-key]}`)
 	- [x] Dynamic (`div{@[place-holder-key]}`)
         - [x] With parameters (`div{@[key|count:3|maxCount:3|seed:5]}`)
-- [ ] Field interpolation (WIP)
-- [ ] Translation (WIP)
+- [x] Field interpolation
+- [x] Translation
 
 ## See also
 - [Emmet &#8212; the essential toolkit for web-developers](https://emmet.io/)
