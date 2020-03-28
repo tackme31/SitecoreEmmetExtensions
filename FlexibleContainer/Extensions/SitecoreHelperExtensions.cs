@@ -1,4 +1,5 @@
-﻿using FlexibleContainer.Renderer;
+﻿using EmmetSharp.Models;
+using EmmetSharp.Renderer;
 using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Globalization;
@@ -38,11 +39,12 @@ namespace FlexibleContainer.Extensions
 
             var parameterValue = RenderingContext.Current.Rendering.Parameters["Expression"];
             var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div" : parameterValue;
-            var result = ExpressionRenderer.Render(expression, textFormatter);
+            var result = AbbreviationRenderer.Render(expression, textFormatter);
             return new HtmlString(result);
 
-            string textFormatter(string text)
+            Node textFormatter(Node node)
             {
+                var text = node.Text;
                 // Field interpolation
                 var fieldMatches = FieldRegex.Matches(text);
                 foreach (Match fieldMatch in fieldMatches)
@@ -96,7 +98,7 @@ namespace FlexibleContainer.Extensions
                     text = StaticPlaceholderRegex.Replace(text, placeholder);
                 }
 
-                return text
+                text = text
                     .Replace("\\[", "[")
                     .Replace("\\]", "]")
                     .Replace("\\{", "{")
@@ -104,6 +106,9 @@ namespace FlexibleContainer.Extensions
                     .Replace("\\(", "(")
                     .Replace("\\)", ")")
                     .Replace("\\\\", "\\");
+
+                node.Text = text;
+                return node;
             }
         }
     }
