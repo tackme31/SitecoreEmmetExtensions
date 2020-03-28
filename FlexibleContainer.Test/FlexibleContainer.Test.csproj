@@ -49,7 +49,16 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EmmetParserTest.cs" />
+    <Compile Include="EmmetSyntax\Attributes.cs" />
+    <Compile Include="EmmetSyntax\Grouping.cs" />
+    <Compile Include="EmmetSyntax\Class.cs" />
+    <Compile Include="EmmetSyntax\Id.cs" />
+    <Compile Include="EmmetSyntax\Multiplication.cs" />
+    <Compile Include="EmmetSyntax\Numbering.cs" />
+    <Compile Include="EmmetSyntax\Node.cs" />
+    <Compile Include="EmmetSyntax\Text.cs" />
+    <Compile Include="EmmetSyntax\Sibling.cs" />
+    <Compile Include="EmmetSyntax\Child.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
