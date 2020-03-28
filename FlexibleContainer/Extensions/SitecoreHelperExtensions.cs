@@ -41,7 +41,13 @@ namespace FlexibleContainer.Extensions
                 var fieldMatches = FieldRegex.Matches(text);
                 foreach (Match fieldMatch in fieldMatches)
                 {
-                    var field = helper.Field(fieldMatch.Value).ToString();
+                    var fieldName = fieldMatch.Groups["fieldName"].Value;
+                    if (string.IsNullOrWhiteSpace(fieldName))
+                    {
+                        continue;
+                    }
+
+                    var field = helper.Field(fieldName).ToString();
                     text = text.Replace(fieldMatch.Value, field);
                 }
 
