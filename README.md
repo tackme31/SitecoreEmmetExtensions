@@ -1,5 +1,5 @@
 # Flexible Container
-*Flexible Container* is a Sitecore rendering to generate a placeholder container with Emmet-like syntax.
+*Flexible Container* is a Sitecore rendering to generate a placeholder container with Emmet abbreviation.
 
 **This software is in early stage of development.**
 
@@ -22,7 +22,8 @@ The example expression above is rendered like the following.
 ```
 
 ## Special Syntax
-*Flexible Container* supports a part of emmet syntax, and some special syntax is added.
+*Flexible Container* supports [a part of emmet syntax](https://github.com/xirtardauq/EmmetSharp), and some special syntax is added.
+
 
 ### Static Placeholder
 A static placeholder is rendered with `{[placeholder-key]}` syntax at the text position.
@@ -54,7 +55,6 @@ div{@[placeholder-key]}
 </div>
 ```
 
-\
 You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxcount:5|seed:10]}`
 
 ### Field Interpolation
@@ -86,28 +86,9 @@ h1{@(Title)}
 <h1>@Translate.Text("Title")</h1>
 ```
 
-## Supported Syntax
-- [x] Child (`div>p`)
-- [x] Sibling (`p+p`)
-- [ ] Climb-up (`p>em^bq`)
-- [x] Multiplication (`li*5`)
-- [x] Grouping (`p+(div>h1)+p>a`)
-- [x] ID & Class (`div#id`, `a.class1.class2`)
-- [x] Custom attributes (`input[type="checkbox" checked]`)
-- [x] Item numbering (`ul>li.item$*5`)
-    - [x] Changing direction (`ul>li.item$@-*5`)
-    - [x] Changing base (`ul>li.item$@3*5`)
-- [x] Text (`a{Content}`)
-    - Without tag (`{Click }+a{here}`)
-- [x] Placeholder
-	- [x] Static (`div{[place-holder-key]}`)
-	- [x] Dynamic (`div{@[place-holder-key]}`)
-        - [x] With parameters (`div{@[key|count:3|maxCount:3|seed:5]}`)
-- [x] Field interpolation
-- [x] Translation
-
 ## See also
 - [Emmet &#8212; the essential toolkit for web-developers](https://emmet.io/)
+- [xirtardauq/EmmetSharp: An Emmet abbreviation parser written in C#](https://github.com/xirtardauq/EmmetSharp)
 
 ## License
 *Flexible Container* is licensed unther the MIT license. See LICENSE.txt.
