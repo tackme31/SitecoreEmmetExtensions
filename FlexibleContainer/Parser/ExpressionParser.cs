@@ -22,7 +22,7 @@ namespace FlexibleContainer.Parser
         public static Node Parse(string expression)
         {
             var root = CreateNode("root");
-            var expressions = SplitExpressionAt(TrimParenthesis(expression), '>');
+            var expressions = SplitExpressionAt(expression, '>');
             root.Children = ParseInner(expressions);
             return root;
         }
@@ -35,7 +35,7 @@ namespace FlexibleContainer.Parser
             }
 
             var firstExpression = expressions[0];
-            var firstSiblings = SplitExpressionAt(TrimParenthesis(firstExpression), '+');
+            var firstSiblings = SplitExpressionAt(firstExpression, '+');
             if (expressions.Count == 1 && firstSiblings.Count == 1)
             {
                 return new List<Node>()
@@ -47,7 +47,7 @@ namespace FlexibleContainer.Parser
             var result = new List<Node>();
             foreach (var sibling in firstSiblings)
             {
-                var siblingExpressions = SplitExpressionAt(TrimParenthesis(sibling), '>');
+                var siblingExpressions = SplitExpressionAt(sibling, '>');
                 var nodes = ParseInner(siblingExpressions);
                 result.AddRange(nodes);
             }
@@ -136,7 +136,7 @@ namespace FlexibleContainer.Parser
             var nest = 0;
             var inText = false;
             var inAttr = false;
-            foreach (var character in expression)
+            foreach (var character in TrimParenthesis(expression))
             {
                 // Update status
                 switch (character)
