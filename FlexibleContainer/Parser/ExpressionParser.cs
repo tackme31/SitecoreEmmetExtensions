@@ -65,7 +65,8 @@ namespace FlexibleContainer.Parser
                 // Multiply nodes
                 for (var i = 1; i <= multiplier; i++)
                 {
-                    var siblingExpressions = SplitExpressionAt(TrimParenthesis(siblingBody), '>');
+                    var numberedBody = ReplaceNumberings(siblingBody, i);
+                    var siblingExpressions = SplitExpressionAt(numberedBody, '>');
                     var nodes = ParseInner(siblingExpressions);
                     result.AddRange(nodes);
                 }
@@ -89,11 +90,20 @@ namespace FlexibleContainer.Parser
             return result;
         }
 
-        private static string TrimParenthesis(string value)
+        private static string ReplaceNumberings(string expression, int number)
         {
-            return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
-                ? value.Substring(1, value.Length - 2)
-                : value;
+            var numberingMatches = NumberingRegex
+                .Matches(expression)
+                .OfType<Match>()
+                .OrderByDescending(m => m.Groups["numbering"].Value.Length);
+            foreach (var numberingMatch in numberingMatches)
+            {
+                var numbering = numberingMatch.Groups["numbering"].Value;
+                var numbers = number.ToString().PadLeft(numbering.Length, '0');
+                expression = expression.Replace(numbering, numbers);
+            }
+
+            return expression;
         }
 
         private static Node CreateNode(string node)
@@ -218,6 +228,13 @@ namespace FlexibleContainer.Parser
             }
 
             return result;
+
+            string TrimParenthesis(string value)
+            {
+                return value.Length > 1 && value[0] == '(' && value[value.Length - 1] == ')'
+                    ? value.Substring(1, value.Length - 2)
+                    : value;
+            }
         }
     }
 }
