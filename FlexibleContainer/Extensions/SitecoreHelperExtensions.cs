@@ -1,6 +1,7 @@
 ﻿using FlexibleContainer.Renderer;
 using Sitecore;
 using Sitecore.Diagnostics;
+using Sitecore.Globalization;
 using Sitecore.Mvc.Helpers;
 using Sitecore.Mvc.Presentation;
 using System.Text.RegularExpressions;
@@ -10,6 +11,10 @@ namespace FlexibleContainer.Extensions
 {
     public static class SitecoreHelperExtensions
     {
+        private static readonly Regex TranslationRegex = new Regex(
+            @"@(?<!\\)\((?<dictionaryKey>[^)]+?)(?<!\\)\)",
+            RegexOptions.Singleline | RegexOptions.Compiled);
+
         private static readonly Regex FieldRegex = new Regex(
             @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(?<!\\)}",
             RegexOptions.Singleline | RegexOptions.Compiled);
@@ -53,6 +58,14 @@ namespace FlexibleContainer.Extensions
                     text = text.Replace(fieldMatch.Value, field);
                 }
 
+                // Translation
+                var translationMatches = TranslationRegex.Matches(text);
+                foreach (Match translationMatch in translationMatches)
+                {
+                    var dictionaryKey = translationMatch.Groups["dictionaryKey"].Value;
+                    text = text.Replace(translationMatch.Value, Translate.Text(dictionaryKey));
+                }
+
                 // Dynamic placeholder
                 var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(text);
                 if (dynamicPlaceholderMatch.Success)
@@ -88,6 +101,8 @@ namespace FlexibleContainer.Extensions
                     .Replace("\\]", "]")
                     .Replace("\\{", "{")
                     .Replace("\\}", "}")
+                    .Replace("\\(", "(")
+                    .Replace("\\)", ")")
                     .Replace("\\\\", "\\");
             }
         }
