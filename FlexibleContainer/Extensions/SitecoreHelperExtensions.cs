@@ -10,20 +10,20 @@ namespace FlexibleContainer.Extensions
     public static class SitecoreHelperExtensions
     {
         private static readonly Regex FieldRegex = new Regex(
-            @"(?<!{){(?<fieldName>[^}]+)}(?!})",
+            @"(?<!\\){(?<fieldName>[^}]+)(?<!\\)}",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
-            @"^(?<!\[)\[(?<placeholderKey>.+)\](?!])$",
+            @"^(?<!\\)\[(?<placeholderKey>.+)(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex DynamicPlaceholderRegex = new Regex(
-            @"^@(?<!\[)\[" +
+            @"^@(?<!\\)\[" +
             @"(?<placeholderKey>.+?)" +
             @"(\|count:(?<count>\d+?))?" +
             @"(\|maxCount:(?<maxCount>\d+?))?" +
             @"(\|seed:(?<seed>\d+?))?" +
-            @"\](?!])$",
+            @"(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
@@ -82,10 +82,11 @@ namespace FlexibleContainer.Extensions
                 }
 
                 return text
-                    .Replace("[[", "[")
-                    .Replace("]]", "]")
-                    .Replace("{{", "{")
-                    .Replace("}}", "}");
+                    .Replace("\\[", "[")
+                    .Replace("\\]", "]")
+                    .Replace("\\{", "{")
+                    .Replace("\\}", "}")
+                    .Replace("\\\\", "\\");
             }
         }
     }
