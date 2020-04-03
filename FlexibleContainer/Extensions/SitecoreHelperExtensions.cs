@@ -18,7 +18,7 @@ namespace FlexibleContainer.Extensions
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex FieldRegex = new Regex(
-            @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(?<!\\)}",
+            @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(\|fromPage:(?<fromPage>[01a-zA-Z]+?))?(?<!\\)}",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
@@ -111,7 +111,12 @@ namespace FlexibleContainer.Extensions
                     }
 
                     var editable = MainUtil.GetBool(match.Groups["editable"].Value, true);
-                    var field = helper.Field(fieldName, new { DisableWebEdit = !editable }).ToString();
+                    var fromPage = MainUtil.GetBool(match.Groups["fromPage"].Value, false);
+                    var datasource = fromPage
+                        ? RenderingContext.Current.PageContext.Item
+                        : RenderingContext.Current.Rendering.Item;
+
+                    var field = helper.Field(fieldName, datasource, new { DisableWebEdit = !editable }).ToString();
                     text = text.Replace(match.Value, field);
                 }
 
