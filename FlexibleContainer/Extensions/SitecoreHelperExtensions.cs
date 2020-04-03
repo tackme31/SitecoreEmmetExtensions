@@ -1,5 +1,5 @@
-﻿using EmmetSharp.Models;
-using EmmetSharp.Renderer;
+﻿using EmmetSharp;
+using EmmetSharp.Models;
 using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Globalization;
@@ -40,33 +40,33 @@ namespace FlexibleContainer.Extensions
 
             var parameterValue = RenderingContext.Current.Rendering.Parameters["Expression"];
             var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div" : parameterValue;
-            var result = AbbreviationRenderer.Render(expression, textFormatter);
+            var result = Emmet.Expand(expression, textFormatter);
             return new HtmlString(result);
 
-            Node textFormatter(Node node)
+            HtmlTag textFormatter(HtmlTag tag)
             {
-                node = ApplyTranslationSyntax(node);
-                node = ApllyFieldInterpolationSyntax(helper, node);
-                node = ApplyDynamicPlaceholderSyntax(helper, node);
-                node = ApplyStaticPlaceholderSyntax(helper, node);
-                node.Text = node.Text
+                tag = ApplyTranslationSyntax(tag);
+                tag = ApllyFieldInterpolationSyntax(helper, tag);
+                tag = ApplyDynamicPlaceholderSyntax(helper, tag);
+                tag = ApplyStaticPlaceholderSyntax(helper, tag);
+                tag.Text = tag.Text
                     .Replace("\\[", "[").Replace("\\]", "]")
                     .Replace("\\{", "{").Replace("\\}", "}")
                     .Replace("\\(", "(").Replace("\\)", ")")
                     .Replace("\\\\", "\\");
 
-                return node;
+                return tag;
             }
         }
 
-        private static Node ApplyTranslationSyntax(Node node)
+        private static HtmlTag ApplyTranslationSyntax(HtmlTag tag)
         {
-            node.Text = DoTranslate(node.Text);
-            node.Id = DoTranslate(node.Id);
-            node.ClassList = node.ClassList?.Select(DoTranslate).ToList();
-            node.Attributes = node.Attributes?.ToDictionary(kv => DoTranslate(kv.Key), e => DoTranslate(e.Value));
+            tag.Text = DoTranslate(tag.Text);
+            tag.Id = DoTranslate(tag.Id);
+            tag.ClassList = tag.ClassList?.Select(DoTranslate).ToList();
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoTranslate(kv.Key), e => DoTranslate(e.Value));
 
-            return node;
+            return tag;
 
             string DoTranslate(string text)
             {
@@ -85,14 +85,14 @@ namespace FlexibleContainer.Extensions
             }
         }
 
-        private static Node ApllyFieldInterpolationSyntax(SitecoreHelper helper, Node node)
+        private static HtmlTag ApllyFieldInterpolationSyntax(SitecoreHelper helper, HtmlTag tag)
         {
-            node.Text = DoInterpolate(node.Text);
-            node.Id = DoInterpolate(node.Id);
-            node.ClassList = node.ClassList?.Select(DoInterpolate).ToList();
-            node.Attributes = node.Attributes?.ToDictionary(kv => DoInterpolate(kv.Key), kv => DoInterpolate(kv.Value));
+            tag.Text = DoInterpolate(tag.Text);
+            tag.Id = DoInterpolate(tag.Id);
+            tag.ClassList = tag.ClassList?.Select(DoInterpolate).ToList();
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoInterpolate(kv.Key), kv => DoInterpolate(kv.Value));
 
-            return node;
+            return tag;
 
             string DoInterpolate(string text)
             {
@@ -119,9 +119,9 @@ namespace FlexibleContainer.Extensions
             }
         }
 
-        private static Node ApplyDynamicPlaceholderSyntax(SitecoreHelper helper, Node node)
+        private static HtmlTag ApplyDynamicPlaceholderSyntax(SitecoreHelper helper, HtmlTag tag)
         {
-            var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(node.Text);
+            var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(tag.Text);
             if (dynamicPlaceholderMatch.Success)
             {
                 var placeholderKey = dynamicPlaceholderMatch.Groups["placeholderKey"].Value;
@@ -138,23 +138,23 @@ namespace FlexibleContainer.Extensions
                     seed = 0;
                 }
                 var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed).ToString();
-                node.Text = DynamicPlaceholderRegex.Replace(node.Text, placeholder);
+                tag.Text = DynamicPlaceholderRegex.Replace(tag.Text, placeholder);
             }
 
-            return node;
+            return tag;
         }
 
-        private static Node ApplyStaticPlaceholderSyntax(SitecoreHelper helper, Node node)
+        private static HtmlTag ApplyStaticPlaceholderSyntax(SitecoreHelper helper, HtmlTag tag)
         {
-            var staticPlaceholderMatch = StaticPlaceholderRegex.Match(node.Text);
+            var staticPlaceholderMatch = StaticPlaceholderRegex.Match(tag.Text);
             if (staticPlaceholderMatch.Success)
             {
                 var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
                 var placeholder = helper.Placeholder(placeholderKey).ToString();
-                node.Text = StaticPlaceholderRegex.Replace(node.Text, placeholder);
+                tag.Text = StaticPlaceholderRegex.Replace(tag.Text, placeholder);
             }
 
-            return node;
+            return tag;
         }
     }
 }
