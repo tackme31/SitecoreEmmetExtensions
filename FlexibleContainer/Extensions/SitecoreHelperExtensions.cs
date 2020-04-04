@@ -1,10 +1,14 @@
 ﻿using EmmetSharp;
 using EmmetSharp.Models;
 using Sitecore;
+using Sitecore.Data;
+using Sitecore.Data.Fields;
+using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Globalization;
 using Sitecore.Mvc.Helpers;
 using Sitecore.Mvc.Presentation;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -18,7 +22,7 @@ namespace FlexibleContainer.Extensions
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex FieldRegex = new Regex(
-            @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(?<!\\)}",
+            @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(\|fromPage:(?<fromPage>[01a-zA-Z]+?))?(?<!\\)}",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
@@ -82,7 +86,7 @@ namespace FlexibleContainer.Extensions
                     text = text.Replace(match.Value, Translate.Text(dictionaryKey));
                 }
                 return text;
-            }
+            } 
         }
 
         private static HtmlTag ApllyFieldInterpolationSyntax(SitecoreHelper helper, HtmlTag tag)
@@ -110,12 +114,39 @@ namespace FlexibleContainer.Extensions
                         continue;
                     }
 
+                    var fromPage = MainUtil.GetBool(match.Groups["fromPage"].Value, false);
+                    var source = ResolveSource(fieldName, fromPage);
                     var editable = MainUtil.GetBool(match.Groups["editable"].Value, true);
-                    var field = helper.Field(fieldName, new { DisableWebEdit = !editable }).ToString();
+                    var field = helper.Field(source.field, source.item, new { DisableWebEdit = !editable }).ToString();
                     text = text.Replace(match.Value, field);
                 }
 
                 return text;
+            }
+
+            (string field, Item item) ResolveSource(string text, bool fromPage)
+            {
+                var item = fromPage
+                    ? RenderingContext.Current.PageContext.Item
+                    : RenderingContext.Current.Rendering.Item;
+                var fieldNames = text?.Split('.') ?? Array.Empty<string>();
+                if (fieldNames.Length <= 1)
+                {
+                    return (text, item);
+                }
+
+                foreach (var fieldName in fieldNames)
+                {
+                    var targetItem = ((LinkField)item.Fields[fieldName])?.TargetItem ?? ((ReferenceField)item.Fields[fieldName])?.TargetItem;
+                    if (targetItem == null)
+                    {
+                        return (fieldName, item);
+                    }
+
+                    item = targetItem;
+                }
+
+                return (text, item);
             }
         }
 
