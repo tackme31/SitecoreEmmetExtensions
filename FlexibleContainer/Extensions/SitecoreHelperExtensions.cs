@@ -40,7 +40,7 @@ namespace FlexibleContainer.Extensions
 
             var parameterValue = RenderingContext.Current.Rendering.Parameters["Expression"];
             var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div" : parameterValue;
-            var result = Emmet.Expand(expression, textFormatter);
+            var result = Emmet.Expand(expression, textFormatter, escapeText: false);
             return new HtmlString(result);
 
             HtmlTag textFormatter(HtmlTag tag)
