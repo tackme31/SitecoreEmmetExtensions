@@ -1,6 +1,7 @@
 ﻿using EmmetSharp;
 using EmmetSharp.Models;
 using Sitecore;
+using Sitecore.Collections;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
@@ -18,24 +19,19 @@ namespace FlexibleContainer.Extensions
     public static class SitecoreHelperExtensions
     {
         private static readonly Regex TranslationRegex = new Regex(
-            @"@(?<!\\)\((?<dictionaryKey>[^)]+?)(?<!\\)\)",
+            @"@(?<!\\)\((?<dictionaryKey>[^)]+?)(\|(?<parameters>.+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex FieldRegex = new Regex(
-            @"(?<!\\){(?<fieldName>[^}]+?)(\|editable:(?<editable>[01a-zA-Z]+?))?(\|fromPage:(?<fromPage>[01a-zA-Z]+?))?(?<!\\)}",
+            @"(?<!\\){(?<fieldName>[^}]+?)(\|(?<parameters>.+))?(?<!\\)}",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
-            @"^(?<!\\)\[(?<placeholderKey>.+)(?<!\\)\]$",
+            @"^(?<!\\)\[(?<placeholderKey>.+)(\|(?<parameters>.+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex DynamicPlaceholderRegex = new Regex(
-            @"^@(?<!\\)\[" +
-            @"(?<placeholderKey>.+?)" +
-            @"(\|count:(?<count>\d+?))?" +
-            @"(\|maxCount:(?<maxCount>\d+?))?" +
-            @"(\|seed:(?<seed>\d+?))?" +
-            @"(?<!\\)\]$",
+            @"^@(?<!\\)\[(?<placeholderKey>.+?)(\|(?<parameters>.+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
@@ -115,9 +111,10 @@ namespace FlexibleContainer.Extensions
                         continue;
                     }
 
-                    var fromPage = MainUtil.GetBool(match.Groups["fromPage"].Value, false);
+                    var parameters = ParseParameters(match.Groups["parameters"].Value);
+                    var fromPage = MainUtil.GetBool(parameters["fromPage"], false);
                     var source = ResolveSource(fieldName, fromPage);
-                    var editable = MainUtil.GetBool(match.Groups["editable"].Value, true);
+                    var editable = MainUtil.GetBool(parameters["editable"], true);
                     var field = helper.Field(source.field, source.item, new { DisableWebEdit = !editable }).ToString();
                     text = text.Replace(match.Value, field);
                 }
@@ -153,22 +150,14 @@ namespace FlexibleContainer.Extensions
 
         private static HtmlTag ApplyDynamicPlaceholderSyntax(SitecoreHelper helper, HtmlTag tag)
         {
-            var dynamicPlaceholderMatch = DynamicPlaceholderRegex.Match(tag.Text);
-            if (dynamicPlaceholderMatch.Success)
+            var match = DynamicPlaceholderRegex.Match(tag.Text);
+            if (match.Success)
             {
-                var placeholderKey = dynamicPlaceholderMatch.Groups["placeholderKey"].Value;
-                if (!int.TryParse(dynamicPlaceholderMatch.Groups["count"].Value, out int count))
-                {
-                    count = 1;
-                }
-                if (!int.TryParse(dynamicPlaceholderMatch.Groups["maxCount"].Value, out int maxCount))
-                {
-                    maxCount = 0;
-                }
-                if (!int.TryParse(dynamicPlaceholderMatch.Groups["seed"].Value, out int seed))
-                {
-                    seed = 0;
-                }
+                var placeholderKey = match.Groups["placeholderKey"].Value;
+                var parameters = ParseParameters(match.Groups["parameters"].Value);
+                var count = MainUtil.GetInt(parameters["count"], 1);
+                var maxCount = MainUtil.GetInt(parameters["maxCount"], 0);
+                var seed = MainUtil.GetInt(parameters["seed"], 0);
                 var placeholder = helper.DynamicPlaceholder(placeholderKey, count, maxCount, seed).ToString();
                 tag.Text = DynamicPlaceholderRegex.Replace(tag.Text, placeholder);
             }
@@ -178,15 +167,36 @@ namespace FlexibleContainer.Extensions
 
         private static HtmlTag ApplyStaticPlaceholderSyntax(SitecoreHelper helper, HtmlTag tag)
         {
-            var staticPlaceholderMatch = StaticPlaceholderRegex.Match(tag.Text);
-            if (staticPlaceholderMatch.Success)
+            var match = StaticPlaceholderRegex.Match(tag.Text);
+            if (match.Success)
             {
-                var placeholderKey = staticPlaceholderMatch.Groups["placeholderKey"].Value;
+                var placeholderKey = match.Groups["placeholderKey"].Value;
                 var placeholder = helper.Placeholder(placeholderKey).ToString();
                 tag.Text = StaticPlaceholderRegex.Replace(tag.Text, placeholder);
             }
 
             return tag;
+        }
+
+        private static SafeDictionary<string, string> ParseParameters(string text)
+        {
+            var result = new SafeDictionary<string, string>();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return result;
+            }
+
+            var parameters = text?
+                .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(parameter => parameter.Split(':'));
+            foreach (var parameter in parameters)
+            {
+                var key = parameter[0].Trim();
+                var value = parameter.Length > 1 ? parameter[1].Trim() : string.Empty;
+                result[key] = value;
+            }
+
+            return result;
         }
     }
 }
