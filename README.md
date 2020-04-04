@@ -1,28 +1,21 @@
+﻿[English](./README.md) | [日本語](./README.ja.md)
+
 # Flexible Container
 *Flexible Container* is a Sitecore rendering to generate a placeholder container with Emmet abbreviation.
 
+![](./img/demo.gif)
+
 **This software is in early stage of development.**
 
+## Installation
+Download the package from [here](https://github.com/xirtardauq/flexible-container/releases) and install it to Sitecore.
+
 ## Usage
-1. Download the package from [here](https://github.com/xirtardauq/flexible-container/releases) and install it to Sitecore.
-1. Add the `Flexible Container` rendering (located in `Renderings/Feature/Flexible Container`) to a page layout.
-1. Set an expression to the `Expression` rendering parameter.
-
-![](./img/control-properties.png)
-
-The example expression above is rendered like the following.
-
-```html
-<div class="row">
-    <a href="/search">Search</a>
-    <div class="col">
-        @Html.Sitecore().Placeholder("container")
-    </div>
-</div>
-```
+1. Add `Flexible Container` rendering (located in `Renderings/Feature/Flexible Container`) to the page layout.
+1. Set an abbreviation to the `Abbreviation` rendering parameter.
 
 ## Special Syntax
-In the *Flexible Container*, the following syntax can be used in addition to [the Emmet syntax](https://github.com/xirtardauq/EmmetSharp).
+In *Flexible Container*, the following syntax can be used in addition to [the Emmet syntax](https://github.com/xirtardauq/EmmetSharp).
 
 - [Static Placeholder](#user-content-static-placeholder)
 - [Dynamic Placeholder](#user-content-dynamic-placeholder)
@@ -30,14 +23,14 @@ In the *Flexible Container*, the following syntax can be used in addition to [th
 - [Translation](#user-content-translation)
 
 ### Static Placeholder
-The static placeholder is rendered with `{[placeholder-key]}` syntax at the text position.
+The static placeholder is rendered with `[placeholder-key]` syntax in the text position.
 
-**Expression:**
+**Abbreviation:**
 ```
 div{[placeholder-key]}
 ```
 
-**Rendered:**
+**Result:**
 ```html
 <div>
     @Html.Sitecore().Placeholder("placeholder-key")
@@ -45,17 +38,17 @@ div{[placeholder-key]}
 ```
 
 **NOTE:**
-Using this syntax within the text is not allowed (ex: `div{foo[ph-within-text]bar}`).
+Using this syntax within the text is not allowed (e.g. `{foo[ph-within-text]bar}`). Split before and after the placeholder like `{foo}{[ph-within-text]{bar}`.
 
 ### Dynamic Placeholder
-The dynamic placeholder is similar to the static one: `{@[placeholder-key]}`.
+The dynamic placeholder is similar to the static one: `@[placeholder-key]`.
 
-**Expression:**
+**Abbreviation:**
 ```
 div{@[placeholder-key]}
 ```
 
-**Rendered:**
+**Result:**
 ```html
 <div>
     @Html.Sitecore().DynamicPlaceholer("placeholder-key")
@@ -65,30 +58,34 @@ div{@[placeholder-key]}
 You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxcount:5|seed:10]}`
 
 ### Field Interpolation
-To display a field value, use the `{field name}` syntax in the text part.
+To display a field value, use the `{field-name}` syntax in the text part.
 
-**Expression:**
+**Abbreviation:**
 ```
 p{Value is: {Title}}
 ```
 
-**Rendered:**
+**Result:**
 ```html
 <p>Value is @Html.Sitecore().Field("Title")</p>
 ```
 
-You can use the `editable` parameter for specifying enable/disable editing (ex: `{Title|editable:false}`).
+You can use the `editable` parameter for specifying enable/disable editing (e.g. `{Title|editable:false}`).
+
+Additionaly, a field that is in a context page can be used ignoring its datasouce by using the `fromPage` parameter like `{{Title|fromPage:true}}`.
+
+If you want to use a link field, write a period after a link field, and write a field name to follow the period (e.g. `{{Category.CategoryName}}`).
+
 
 ### Translation
 The `@(dictionary-key)` syntax allows you to translate a text with the `Translate.Text`.
 
-
-**Expression:**
+**Abbreviation:**
 ```
 h1{@(Title)}
 ```
 
-**Rendered:**
+**Result:**
 ```html
 <h1>@Translate.Text("Title")</h1>
 ```
