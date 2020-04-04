@@ -42,9 +42,10 @@ namespace FlexibleContainer.Extensions
         {
             Assert.ArgumentNotNull(helper, nameof(helper));
 
-            var parameterValue = RenderingContext.Current.Rendering.Parameters["Expression"];
-            var expression = string.IsNullOrWhiteSpace(parameterValue) ? "div" : parameterValue;
-            var result = Emmet.Expand(expression, textFormatter, escapeText: false);
+            var abbreviation = RenderingContext.Current.Rendering.Parameters["Abbreviation"];
+            abbreviation = string.IsNullOrWhiteSpace(abbreviation) ? "div" : abbreviation;
+
+            var result = Emmet.Expand(abbreviation, textFormatter, escapeText: false);
             return new HtmlString(result);
 
             HtmlTag textFormatter(HtmlTag tag)
