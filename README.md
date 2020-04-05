@@ -38,7 +38,7 @@ div{[placeholder-key]}
 ```
 
 **NOTE:**
-Using this syntax within the text is not allowed (e.g. `{foo[ph-within-text]bar}`). Split before and after the placeholder like `{foo}{[ph-within-text]{bar}`.
+Using this syntax within the text is not allowed (e.g. `{foo[ph-within-text]bar}`). Split before and after the placeholder like `{foo}+{[ph-within-text]}+{bar}`.
 
 ### Dynamic Placeholder
 The dynamic placeholder is similar to the static one: `@[placeholder-key]`.
