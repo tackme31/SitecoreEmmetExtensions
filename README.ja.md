@@ -17,10 +17,10 @@
 ## 特殊記法
 *Flexible Container*には、[通常のEmmet記法](https://github.com/xirtardauq/EmmetSharp)に加えて、以下のような特殊な記法が追加されています。
 
-- [静的プレースホルダ](#user-content-static-placeholder)
-- [動的プレースホルダ](#user-content-dynamic-placeholder)
-- [フィールド埋め込み](#user-content-field-interpolation)
-- [翻訳](#user-content-translation)
+- [静的プレースホルダ](#user-content-静的プレースホルダ)
+- [動的プレースホルダ](#user-content-動的プレースホルダ)
+- [フィールド埋め込み](#user-content-フィールド埋め込み)
+- [翻訳](#user-content-翻訳)
 
 ### 静的プレースホルダ
 HTMLタグのテキスト部分に`[placeholder-key]`と記述することで、静的なプレースホルダを生成することができます。
