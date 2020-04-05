@@ -55,7 +55,7 @@ div{@[placeholder-key]}
 </div>
 ```
 
-You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxcount:5|seed:10]}`
+You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxCount:5|seed:10]}`
 
 ### Field Interpolation
 To display a field value, use the `{field-name}` syntax in the text part.

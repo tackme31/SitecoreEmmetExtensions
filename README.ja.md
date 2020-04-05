@@ -54,7 +54,7 @@ div{@[placeholder-key]}
 </div>
 ```
 
-`count`, `maxCount`, `seed`パラメータを使用するには`{@[key|count:3|maxcount:5|seed:10]}`のようにパイプ区切りで指定します。
+`count`, `maxCount`, `seed`パラメータを使用するには`{@[key|count:3|maxCount:5|seed:10]}`のようにパイプ区切りで指定します。
 
 ### フィールド埋め込み
 属性値やテキストなどにフィールドを埋め込むには`{field-name}`という記法を使用します。
