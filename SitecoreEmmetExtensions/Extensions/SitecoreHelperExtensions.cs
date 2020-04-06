@@ -2,7 +2,6 @@
 using EmmetSharp.Models;
 using Sitecore;
 using Sitecore.Collections;
-using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
@@ -14,7 +13,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace FlexibleContainer.Extensions
+namespace SitecoreEmmetExtensions.Extensions
 {
     public static class SitecoreHelperExtensions
     {
@@ -34,7 +33,7 @@ namespace FlexibleContainer.Extensions
             @"^@(?<!\\)\[(?<placeholderKey>.+?)(\|(?<parameters>.+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public static HtmlString RenderFlexibleContainer(this SitecoreHelper helper)
+        public static HtmlString RenderEmmetAbbreviation(this SitecoreHelper helper)
         {
             Assert.ArgumentNotNull(helper, nameof(helper));
 
