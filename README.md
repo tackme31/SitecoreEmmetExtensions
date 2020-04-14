@@ -19,7 +19,8 @@ In *Sitecore Emmet Extensions*, the following syntax can be used in addition to 
 
 - [Static Placeholder](#user-content-static-placeholder)
 - [Dynamic Placeholder](#user-content-dynamic-placeholder)
-- [Field Interpolation](#user-content-field-interpolation)
+- [Field](#user-content-field)
+- [Link](#user-content-link)
 - [Translation](#user-content-translation)
 
 ### Static Placeholder
@@ -57,8 +58,8 @@ div{@[placeholder-key]}
 
 You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxCount:5|seed:10]}`
 
-### Field Interpolation
-To display a field value, use the `{field-name}` syntax in the text part.
+### Field
+To display a field value, use the `$(field-name)` syntax in the text part.
 
 **Abbreviation:**
 ```
