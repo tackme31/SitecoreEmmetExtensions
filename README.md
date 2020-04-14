@@ -1,7 +1,7 @@
 ﻿[English](./README.md) | [日本語](./README.ja.md)
 
-# Flexible Container
-*Flexible Container* is a Sitecore rendering to generate a placeholder container with Emmet abbreviation.
+# Sitecore Emmet Extensions
+*Sitecore Emmet Extensions* is a Sitecore rendering to generate a placeholder container with Emmet abbreviation.
 
 ![](./img/demo.gif)
 
@@ -11,11 +11,11 @@
 Download the package from [here](https://github.com/xirtardauq/flexible-container/releases) and install it to Sitecore.
 
 ## Usage
-1. Add `Flexible Container` rendering (located in `Renderings/Feature/Flexible Container`) to the page layout.
+1. Add `Emmet Abbreviation` rendering (located in `Renderings/Feature/Sitecore Emmet Extensions`) to the page layout.
 1. Set an abbreviation to the `Abbreviation` rendering parameter.
 
 ## Special Syntax
-In *Flexible Container*, the following syntax can be used in addition to [the Emmet syntax](https://github.com/xirtardauq/EmmetSharp).
+In *Sitecore Emmet Extensions*, the following syntax can be used in addition to [Emmet syntax](https://github.com/xirtardauq/EmmetSharp).
 
 - [Static Placeholder](#user-content-static-placeholder)
 - [Dynamic Placeholder](#user-content-dynamic-placeholder)
@@ -95,7 +95,7 @@ h1{@(Title)}
 - [xirtardauq/EmmetSharp: An Emmet abbreviation parser written in C#](https://github.com/xirtardauq/EmmetSharp)
 
 ## License
-*Flexible Container* is licensed unther the MIT license. See LICENSE.txt.
+*Sitecore Emmet Extensions* is licensed unther the MIT license. See LICENSE.txt.
 
 ## Author
 - Takumi Yamada (xirtardauq@gmail.com)

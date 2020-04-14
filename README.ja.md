@@ -1,7 +1,7 @@
 ﻿[English](./README.md) | [日本語](./README.ja.md)
 
-# Flexible Container
-*Flexible Container* はEmmet記法でレンダリングを作成することができるSitecoreの拡張モジュールです。
+# Sitecore Emmet Extensions
+*Sitecore Emmet Extensions* はEmmet記法でレンダリングを作成することができるSitecoreの拡張モジュールです。
 
 ![](./img/demo.gif)
 
@@ -11,11 +11,11 @@
 [こちら](https://github.com/xirtardauq/flexible-container/releases)からパッケージをダウンロードし、インストールウィザードを使用してSitecoreにインストールしてください。
 
 ## 使い方
-1. レイアウト詳細に`Flexible Container`レンダリングを追加します。レンダリングは`Renderings/Feature/Flexible Container`にあります。
+1. レイアウト詳細に`Emmet Abbreviation`レンダリングを追加します。レンダリングは`Renderings/Feature/Sitecore Emmet Extensions`にあります。
 1. レンダリングの`Abbreviation`パラメータにEmmetの式を入力します。
 
 ## 特殊記法
-*Flexible Container*には、[通常のEmmet記法](https://github.com/xirtardauq/EmmetSharp)に加えて、以下のような特殊な記法が追加されています。
+*Sitecore Emmet Extensions*には、[通常のEmmet記法](https://github.com/xirtardauq/EmmetSharp)に加えて、以下のような特殊な記法が追加されています。
 
 - [静的プレースホルダ](#user-content-静的プレースホルダ)
 - [動的プレースホルダ](#user-content-動的プレースホルダ)
@@ -93,7 +93,7 @@ h1{@(Title)}
 - [xirtardauq/EmmetSharp: An Emmet abbreviation parser written in C#](https://github.com/xirtardauq/EmmetSharp)
 
 ## ライセンス
-*Flexible Container*はMITライセンスでリリースされています。
+*Sitecore Emmet Extensions*はMITライセンスでリリースされています。
 
 ## 作者
 - 山田拓実 (xirtardauq@gmail.com)

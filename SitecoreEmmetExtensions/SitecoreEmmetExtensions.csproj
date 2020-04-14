@@ -7,8 +7,8 @@
     <ProjectGuid>{0FF6905D-63B0-409D-BBC3-A92A978E61E5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FlexibleContainer</RootNamespace>
-    <AssemblyName>FlexibleContainer</AssemblyName>
+    <RootNamespace>SitecoreEmmetExtensions</RootNamespace>
+    <AssemblyName>SitecoreEmmetExtensions</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -84,7 +84,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="Views\Flexible Container\Flexible Container.cshtml" />
+    <None Include="Views\Sitecore Emmet Extensions\Emmet Abbreviation.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
