@@ -23,7 +23,7 @@ namespace SitecoreEmmetExtensions.Extensions
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex FieldRegex = new Regex(
-            @"(?<!\\){(?<fieldName>[^}]+?)(\|(?<parameters>.+))?(?<!\\)}",
+            @"\$(?<!\\)\((?<fieldName>[^)]+?)(\|(?<parameters>.+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex LinkRegex = new Regex(
