@@ -6,6 +6,7 @@ using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Globalization;
+using Sitecore.Links;
 using Sitecore.Mvc.Helpers;
 using Sitecore.Mvc.Presentation;
 using System;
@@ -23,6 +24,10 @@ namespace SitecoreEmmetExtensions.Extensions
 
         private static readonly Regex FieldRegex = new Regex(
             @"(?<!\\){(?<fieldName>[^}]+?)(\|(?<parameters>.+))?(?<!\\)}",
+            RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private static readonly Regex LinkRegex = new Regex(
+            @"->(?<!\\)\((?<pathOrId>[^)]+?)(\|(?<parameters>.+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
@@ -46,7 +51,8 @@ namespace SitecoreEmmetExtensions.Extensions
             HtmlTag textFormatter(HtmlTag tag)
             {
                 tag = ApplyTranslationSyntax(tag);
-                tag = ApllyFieldInterpolationSyntax(helper, tag);
+                tag = ApplyFieldInterpolationSyntax(helper, tag);
+                tag = ApplyLinkSyntax(tag);
                 tag = ApplyDynamicPlaceholderSyntax(helper, tag);
                 tag = ApplyStaticPlaceholderSyntax(helper, tag);
                 tag.Text = tag.Text
@@ -85,7 +91,7 @@ namespace SitecoreEmmetExtensions.Extensions
             } 
         }
 
-        private static HtmlTag ApllyFieldInterpolationSyntax(SitecoreHelper helper, HtmlTag tag)
+        private static HtmlTag ApplyFieldInterpolationSyntax(SitecoreHelper helper, HtmlTag tag)
         {
             tag.Text = DoInterpolate(tag.Text);
             tag.Id = DoInterpolate(tag.Id);
@@ -144,6 +150,32 @@ namespace SitecoreEmmetExtensions.Extensions
                 }
 
                 return (text, item);
+            }
+        }
+
+        private static HtmlTag ApplyLinkSyntax(HtmlTag tag)
+        {
+            tag.Text = MakeUrl(tag.Text);
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => MakeUrl(kv.Key), e => MakeUrl(e.Value));
+
+            return tag;
+
+            string MakeUrl(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+
+                var matches = LinkRegex.Matches(text);
+                foreach (Match match in matches)
+                {
+                    var pathOrId = match.Groups["pathOrId"].Value;
+                    var item = Context.Database.GetItem(pathOrId);
+                    var url = item == null ? "#" : LinkManager.GetItemUrl(item);
+                    text = text.Replace(match.Value, url);
+                }
+                return text;
             }
         }
 
