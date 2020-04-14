@@ -51,7 +51,7 @@ namespace SitecoreEmmetExtensions.Extensions
             HtmlTag textFormatter(HtmlTag tag)
             {
                 tag = ApplyTranslationSyntax(tag);
-                tag = ApplyFieldInterpolationSyntax(helper, tag);
+                tag = ApplyFieldSyntax(helper, tag);
                 tag = ApplyLinkSyntax(tag);
                 tag = ApplyDynamicPlaceholderSyntax(helper, tag);
                 tag = ApplyStaticPlaceholderSyntax(helper, tag);
@@ -91,7 +91,7 @@ namespace SitecoreEmmetExtensions.Extensions
             } 
         }
 
-        private static HtmlTag ApplyFieldInterpolationSyntax(SitecoreHelper helper, HtmlTag tag)
+        private static HtmlTag ApplyFieldSyntax(SitecoreHelper helper, HtmlTag tag)
         {
             tag.Text = DoInterpolate(tag.Text);
             tag.Id = DoInterpolate(tag.Id);
@@ -119,9 +119,17 @@ namespace SitecoreEmmetExtensions.Extensions
                     var parameters = ParseParameters(match.Groups["parameters"].Value);
                     var fromPage = MainUtil.GetBool(parameters["fromPage"], false);
                     var source = ResolveSource(fieldName, fromPage);
-                    var editable = MainUtil.GetBool(parameters["editable"], true);
-                    var field = helper.Field(source.field, source.item, new { DisableWebEdit = !editable }).ToString();
-                    text = text.Replace(match.Value, field);
+                    var rawValue = MainUtil.GetBool(parameters["raw"], false);
+                    if (rawValue)
+                    {
+                        text = text.Replace(match.Value, source.item[source.field]);
+                    }
+                    else
+                    {
+                        var editable = MainUtil.GetBool(parameters["editable"], true);
+                        var field = helper.Field(source.field, source.item, new { DisableWebEdit = !editable }).ToString();
+                        text = text.Replace(match.Value, field);
+                    }
                 }
 
                 return text;
