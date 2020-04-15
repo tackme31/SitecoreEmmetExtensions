@@ -19,23 +19,23 @@ namespace SitecoreEmmetExtensions.Extensions
     public static class SitecoreHelperExtensions
     {
         private static readonly Regex TranslationRegex = new Regex(
-            @"@(?<!\\)\((?<dictionaryKey>[^)]+?)(\|(?<parameters>.+))?(?<!\\)\)",
+            @"@(?<!\\)\((?<dictionaryKey>[^)]+?)(\|(?<parameters>[^)]+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex FieldRegex = new Regex(
-            @"#(?<!\\)\((?<fieldName>[^)]+?)(\|(?<parameters>.+))?(?<!\\)\)",
+            @"#(?<!\\)\((?<fieldName>[^)]+?)(\|(?<parameters>[^)]+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex LinkRegex = new Regex(
-            @"->(?<!\\)\((?<pathOrId>[^)]+?)(\|(?<parameters>.+))?(?<!\\)\)",
+            @"->(?<!\\)\((?<pathOrId>[^)]+?)(\|(?<parameters>[^)]+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
-            @"^(?<!\\)\[(?<placeholderKey>.+)(\|(?<parameters>.+))?(?<!\\)\]$",
+            @"^(?<!\\)\[(?<placeholderKey>[^}]+)(\|(?<parameters>[^}]+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex DynamicPlaceholderRegex = new Regex(
-            @"^@(?<!\\)\[(?<placeholderKey>.+?)(\|(?<parameters>.+))?(?<!\\)\]$",
+            @"^@(?<!\\)\[(?<placeholderKey>[^}]+?)(\|(?<parameters>[^}]+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static HtmlString RenderEmmetAbbreviation(this SitecoreHelper helper, string abbreviation)
