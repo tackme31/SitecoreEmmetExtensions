@@ -66,9 +66,7 @@ namespace SitecoreEmmetExtensions.Extensions
         private static HtmlTag ApplyFieldSyntax(SitecoreHelper helper, HtmlTag tag)
         {
             tag.Text = DoInterpolate(tag.Text);
-            tag.Id = DoInterpolate(tag.Id);
-            tag.ClassList = tag.ClassList?.Select(DoInterpolate).ToList();
-            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoInterpolate(kv.Key), kv => DoInterpolate(kv.Value));
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => kv.Key, kv => DoInterpolate(kv.Value));
 
             return tag;
 
@@ -136,9 +134,7 @@ namespace SitecoreEmmetExtensions.Extensions
         private static HtmlTag ApplyTranslationSyntax(HtmlTag tag)
         {
             tag.Text = DoTranslate(tag.Text);
-            tag.Id = DoTranslate(tag.Id);
-            tag.ClassList = tag.ClassList?.Select(DoTranslate).ToList();
-            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoTranslate(kv.Key), e => DoTranslate(e.Value));
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => kv.Key, e => DoTranslate(e.Value));
 
             return tag;
 
@@ -162,7 +158,7 @@ namespace SitecoreEmmetExtensions.Extensions
         private static HtmlTag ApplyLinkSyntax(HtmlTag tag)
         {
             tag.Text = MakeUrl(tag.Text);
-            tag.Attributes = tag.Attributes?.ToDictionary(kv => MakeUrl(kv.Key), e => MakeUrl(e.Value));
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => kv.Key, e => MakeUrl(e.Value));
 
             return tag;
 
