@@ -38,12 +38,10 @@ namespace SitecoreEmmetExtensions.Extensions
             @"^@(?<!\\)\[(?<placeholderKey>.+?)(\|(?<parameters>.+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public static HtmlString RenderEmmetAbbreviation(this SitecoreHelper helper)
+        public static HtmlString RenderEmmetAbbreviation(this SitecoreHelper helper, string abbreviation)
         {
             Assert.ArgumentNotNull(helper, nameof(helper));
-
-            var abbreviation = RenderingContext.Current.Rendering.Parameters["Abbreviation"];
-            abbreviation = string.IsNullOrWhiteSpace(abbreviation) ? "div" : abbreviation;
+            Assert.ArgumentNotNullOrEmpty(abbreviation, nameof(abbreviation));
 
             var result = Emmet.Expand(abbreviation, textFormatter, escapeText: false);
             return new HtmlString(result);
