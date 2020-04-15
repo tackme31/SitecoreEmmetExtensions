@@ -31,11 +31,11 @@ namespace SitecoreEmmetExtensions.Extensions
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
-            @"^(?<!\\)\[(?<placeholderKey>[^}]+)(\|(?<parameters>[^}]+))?(?<!\\)\]$",
+            @"^(?<!\\)\[(?<placeholderKey>[^]]+)(\|(?<parameters>[^]]+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex DynamicPlaceholderRegex = new Regex(
-            @"^@(?<!\\)\[(?<placeholderKey>[^}]+?)(\|(?<parameters>[^}]+))?(?<!\\)\]$",
+            @"^@(?<!\\)\[(?<placeholderKey>[^]]+?)(\|(?<parameters>[^]]+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static HtmlString RenderEmmetAbbreviation(this SitecoreHelper helper, string abbreviation)
@@ -48,8 +48,8 @@ namespace SitecoreEmmetExtensions.Extensions
 
             HtmlTag textFormatter(HtmlTag tag)
             {
-                tag = ApplyTranslationSyntax(tag);
                 tag = ApplyFieldSyntax(helper, tag);
+                tag = ApplyTranslationSyntax(tag);
                 tag = ApplyLinkSyntax(tag);
                 tag = ApplyDynamicPlaceholderSyntax(helper, tag);
                 tag = ApplyStaticPlaceholderSyntax(helper, tag);
@@ -61,32 +61,6 @@ namespace SitecoreEmmetExtensions.Extensions
 
                 return tag;
             }
-        }
-
-        private static HtmlTag ApplyTranslationSyntax(HtmlTag tag)
-        {
-            tag.Text = DoTranslate(tag.Text);
-            tag.Id = DoTranslate(tag.Id);
-            tag.ClassList = tag.ClassList?.Select(DoTranslate).ToList();
-            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoTranslate(kv.Key), e => DoTranslate(e.Value));
-
-            return tag;
-
-            string DoTranslate(string text)
-            {
-                if (string.IsNullOrEmpty(text))
-                {
-                    return text;
-                }
-
-                var matches = TranslationRegex.Matches(text);
-                foreach (Match match in matches)
-                {
-                    var dictionaryKey = match.Groups["dictionaryKey"].Value;
-                    text = text.Replace(match.Value, Translate.Text(dictionaryKey));
-                }
-                return text;
-            } 
         }
 
         private static HtmlTag ApplyFieldSyntax(SitecoreHelper helper, HtmlTag tag)
@@ -156,6 +130,32 @@ namespace SitecoreEmmetExtensions.Extensions
                 }
 
                 return (text, item);
+            }
+        }
+
+        private static HtmlTag ApplyTranslationSyntax(HtmlTag tag)
+        {
+            tag.Text = DoTranslate(tag.Text);
+            tag.Id = DoTranslate(tag.Id);
+            tag.ClassList = tag.ClassList?.Select(DoTranslate).ToList();
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoTranslate(kv.Key), e => DoTranslate(e.Value));
+
+            return tag;
+
+            string DoTranslate(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+
+                var matches = TranslationRegex.Matches(text);
+                foreach (Match match in matches)
+                {
+                    var dictionaryKey = match.Groups["dictionaryKey"].Value;
+                    text = text.Replace(match.Value, Translate.Text(dictionaryKey));
+                }
+                return text;
             }
         }
 
