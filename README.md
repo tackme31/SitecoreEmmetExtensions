@@ -1,7 +1,7 @@
 ﻿[English](./README.md) | [日本語](./README.ja.md)
 
 # Sitecore Emmet Extensions
-*Sitecore Emmet Extensions* is a Sitecore rendering to generate a placeholder container with Emmet abbreviation.
+*Sitecore Emmet Extensions* is a Sitecore module to make a rendering with Emmet abbreviation.
 
 ![](./img/demo.gif)
 
@@ -20,18 +20,22 @@ In *Sitecore Emmet Extensions*, the following syntax can be used in addition to 
 - [Static Placeholder](#user-content-static-placeholder)
 - [Dynamic Placeholder](#user-content-dynamic-placeholder)
 - [Field](#user-content-field)
-- [Link](#user-content-link)
 - [Translation](#user-content-translation)
+- [Link](#user-content-link)
+
+All example's result just means a Razor code that is output as the same result. In reality, the result is directly rendered as an HTML code.
 
 ### Static Placeholder
-The static placeholder is rendered with `[placeholder-key]` syntax in the text position.
+**Syntax:** `[placeholder-key]`
 
-**Abbreviation:**
+**Example:**  
+
+- Abbreviation
 ```
 div{[placeholder-key]}
 ```
 
-**Result:**
+- Result
 ```html
 <div>
     @Html.Sitecore().Placeholder("placeholder-key")
@@ -42,54 +46,126 @@ div{[placeholder-key]}
 Using this syntax within the text is not allowed (e.g. `{foo[ph-within-text]bar}`). Split before and after the placeholder like `{foo}+{[ph-within-text]}+{bar}`.
 
 ### Dynamic Placeholder
-The dynamic placeholder is similar to the static one: `@[placeholder-key]`.
+**Syntax:** `@[placeholder-key]`
 
-**Abbreviation:**
+**Parameters:**
+|Parameter|Type|Description|
+|-|-|-|
+|`count`|int|A value passed to `Html.Sitecore().Placeholder`'s `count` argument.|
+|`maxCount`|int|A value passed to `Html.Sitecore().Placeholder`'s `maxCount` argument.|
+|`seed`|int|A value passed to `Html.Sitecore().Placeholder`'s `seed` argument.|
+
+**Example 1:**  
+- Abbreviation
 ```
 div{@[placeholder-key]}
 ```
 
-**Result:**
+- Result
 ```html
 <div>
     @Html.Sitecore().DynamicPlaceholer("placeholder-key")
 </div>
 ```
 
-You can use this syntax with the `count`, `maxCount`, `seed` parameters like `{@[key|count:3|maxCount:5|seed:10]}`
+**Example 2:**  
+- Abbreviation
+```
+div{@[placeholder-key|count:3|seed:1]}
+```
+
+- Result
+```html
+<div>
+    @Html.Sitecore().DynamicPlaceholer("placeholder-key", count: 3, seed: 1)
+</div>
+```
 
 ### Field
-To display a field value, use the `$(field-name)` syntax in the text part.
+**Syntax:** `#(field-name)`
 
-**Abbreviation:**
+**Parameters:**
+|Parameter|Type|Description|
+|-|-|-|
+|`editable`|bool|Switch enable/disable editing on the Experience Editor.|
+|`fromPage`|bool|When set true, force to use a context page instead of a datasource.|
+|`raw`|bool|When set true, render a field as raw value.|
+
+**Example 1:**
+- Abbreviation
 ```
-p{Value is: {Title}}
+p{Value is: #(Title|editable:false)}
 ```
 
-**Result:**
+- Result
 ```html
-<p>Value is @Html.Sitecore().Field("Title")</p>
+<p>Value is @Html.Sitecore().Field("Title", new { DisableWebEdit: true })</p>
 ```
 
-You can use the `editable` parameter for specifying enable/disable editing (e.g. `{Title|editable:false}`).
+**Example 2:**  
+If you want to use a link field, write a period after a link field, and write a field name to follow the period
+- Abbreviation
+```
+p{Category Name: #(Category.Name)}
+```
 
-Additionaly, a field that is in a context page can be used ignoring its datasouce by using the `fromPage` parameter like `{{Title|fromPage:true}}`.
-
-If you want to use a link field, write a period after a link field, and write a field name to follow the period (e.g. `{{Category.CategoryName}}`).
-
+- Result
+```html
+@{
+    var category = ...; // A category specified in the "Category" field.
+}
+<p>Value is @Html.Sitecore().Field("Name", category)</p>
+```
 
 ### Translation
-The `@(dictionary-key)` syntax allows you to translate a text with the `Translate.Text`.
+**Syntax:** `@(dictionary-key)`
 
-**Abbreviation:**
+**Example:**
+- Abbreviation
 ```
 h1{@(Title)}
 ```
 
-**Result:**
+- Result
 ```html
 <h1>@Translate.Text("Title")</h1>
 ```
+
+### Link
+**Syntax:** `->(Path or ID)`
+
+**Example 1:**
+- Abbreviation
+```
+a[href="->(2f83dec8-25bd-4663-a11a-c294fd016573)"]{Link to about}
+```
+
+- Result
+```html
+@{
+    var item = Context.Database.GetItem("2f83dec8-25bd-4663-a11a-c294fd016573");
+}
+<a href="@LinkManager.GetItemUrl(item)">Link to about</a>
+```
+
+**Example 2:**  
+This syntax can be collaborated with Field syntax. The example below renders an URL to an item that is specified in the Search Page field.
+
+- Abbreviation
+```
+a[href="->(#(Search Page|raw:true))"]{Link to search}
+```
+
+- Result
+```html
+@{
+    var item = ...; // An item specified in the "Search Page" field.
+}
+<a href="@LinkManager.GetItemUrl(item)">Link to about</a>
+```
+
+**NOTE:**
+Due to Emmet's text syntax cannot be contained an end brace (e.g. `{foo}bar}`), so **an ID in link syntax should not contain braces like Example 1.**
 
 ## See also
 - [Emmet &#8212; the essential toolkit for web-developers](https://emmet.io/)
