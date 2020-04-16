@@ -1,2 +1,6 @@
 @using SitecoreEmmetExtensions.Extensions
-@Html.Sitecore().RenderEmmetAbbreviation()
+@{
+    var param = RenderingContext.Current.Rendering.Parameters["Abbreviation"];
+    var abbreviation = string.IsNullOrWhiteSpace(param) ? "div" : param;
+}
+@Html.Sitecore().RenderEmmetAbbreviation(abbreviation)

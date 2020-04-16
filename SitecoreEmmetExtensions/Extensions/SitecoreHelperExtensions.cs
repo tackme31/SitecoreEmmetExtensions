@@ -6,6 +6,7 @@ using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Globalization;
+using Sitecore.Links;
 using Sitecore.Mvc.Helpers;
 using Sitecore.Mvc.Presentation;
 using System;
@@ -18,35 +19,38 @@ namespace SitecoreEmmetExtensions.Extensions
     public static class SitecoreHelperExtensions
     {
         private static readonly Regex TranslationRegex = new Regex(
-            @"@(?<!\\)\((?<dictionaryKey>[^)]+?)(\|(?<parameters>.+))?(?<!\\)\)",
+            @"@(?<!\\)\((?<dictionaryKey>[^)]+?)(\|(?<parameters>[^)]+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex FieldRegex = new Regex(
-            @"(?<!\\){(?<fieldName>[^}]+?)(\|(?<parameters>.+))?(?<!\\)}",
+            @"#(?<!\\)\((?<fieldName>[^)]+?)(\|(?<parameters>[^)]+))?(?<!\\)\)",
+            RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private static readonly Regex LinkRegex = new Regex(
+            @"->(?<!\\)\((?<pathOrId>[^)]+?)(\|(?<parameters>[^)]+))?(?<!\\)\)",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex StaticPlaceholderRegex = new Regex(
-            @"^(?<!\\)\[(?<placeholderKey>.+)(\|(?<parameters>.+))?(?<!\\)\]$",
+            @"^(?<!\\)\[(?<placeholderKey>[^]]+)(\|(?<parameters>[^]]+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
         private static readonly Regex DynamicPlaceholderRegex = new Regex(
-            @"^@(?<!\\)\[(?<placeholderKey>.+?)(\|(?<parameters>.+))?(?<!\\)\]$",
+            @"^@(?<!\\)\[(?<placeholderKey>[^]]+?)(\|(?<parameters>[^]]+))?(?<!\\)\]$",
             RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public static HtmlString RenderEmmetAbbreviation(this SitecoreHelper helper)
+        public static HtmlString RenderEmmetAbbreviation(this SitecoreHelper helper, string abbreviation)
         {
             Assert.ArgumentNotNull(helper, nameof(helper));
-
-            var abbreviation = RenderingContext.Current.Rendering.Parameters["Abbreviation"];
-            abbreviation = string.IsNullOrWhiteSpace(abbreviation) ? "div" : abbreviation;
+            Assert.ArgumentNotNullOrEmpty(abbreviation, nameof(abbreviation));
 
             var result = Emmet.Expand(abbreviation, textFormatter, escapeText: false);
             return new HtmlString(result);
 
             HtmlTag textFormatter(HtmlTag tag)
             {
+                tag = ApplyFieldSyntax(helper, tag);
                 tag = ApplyTranslationSyntax(tag);
-                tag = ApllyFieldInterpolationSyntax(helper, tag);
+                tag = ApplyLinkSyntax(tag);
                 tag = ApplyDynamicPlaceholderSyntax(helper, tag);
                 tag = ApplyStaticPlaceholderSyntax(helper, tag);
                 tag.Text = tag.Text
@@ -59,38 +63,10 @@ namespace SitecoreEmmetExtensions.Extensions
             }
         }
 
-        private static HtmlTag ApplyTranslationSyntax(HtmlTag tag)
-        {
-            tag.Text = DoTranslate(tag.Text);
-            tag.Id = DoTranslate(tag.Id);
-            tag.ClassList = tag.ClassList?.Select(DoTranslate).ToList();
-            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoTranslate(kv.Key), e => DoTranslate(e.Value));
-
-            return tag;
-
-            string DoTranslate(string text)
-            {
-                if (string.IsNullOrEmpty(text))
-                {
-                    return text;
-                }
-
-                var matches = TranslationRegex.Matches(text);
-                foreach (Match match in matches)
-                {
-                    var dictionaryKey = match.Groups["dictionaryKey"].Value;
-                    text = text.Replace(match.Value, Translate.Text(dictionaryKey));
-                }
-                return text;
-            } 
-        }
-
-        private static HtmlTag ApllyFieldInterpolationSyntax(SitecoreHelper helper, HtmlTag tag)
+        private static HtmlTag ApplyFieldSyntax(SitecoreHelper helper, HtmlTag tag)
         {
             tag.Text = DoInterpolate(tag.Text);
-            tag.Id = DoInterpolate(tag.Id);
-            tag.ClassList = tag.ClassList?.Select(DoInterpolate).ToList();
-            tag.Attributes = tag.Attributes?.ToDictionary(kv => DoInterpolate(kv.Key), kv => DoInterpolate(kv.Value));
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => kv.Key, kv => DoInterpolate(kv.Value));
 
             return tag;
 
@@ -113,9 +89,17 @@ namespace SitecoreEmmetExtensions.Extensions
                     var parameters = ParseParameters(match.Groups["parameters"].Value);
                     var fromPage = MainUtil.GetBool(parameters["fromPage"], false);
                     var source = ResolveSource(fieldName, fromPage);
-                    var editable = MainUtil.GetBool(parameters["editable"], true);
-                    var field = helper.Field(source.field, source.item, new { DisableWebEdit = !editable }).ToString();
-                    text = text.Replace(match.Value, field);
+                    var rawValue = MainUtil.GetBool(parameters["raw"], false);
+                    if (rawValue)
+                    {
+                        text = text.Replace(match.Value, source.item[source.field]);
+                    }
+                    else
+                    {
+                        var editable = MainUtil.GetBool(parameters["editable"], true);
+                        var field = helper.Field(source.field, source.item, new { DisableWebEdit = !editable }).ToString();
+                        text = text.Replace(match.Value, field);
+                    }
                 }
 
                 return text;
@@ -144,6 +128,56 @@ namespace SitecoreEmmetExtensions.Extensions
                 }
 
                 return (text, item);
+            }
+        }
+
+        private static HtmlTag ApplyTranslationSyntax(HtmlTag tag)
+        {
+            tag.Text = DoTranslate(tag.Text);
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => kv.Key, e => DoTranslate(e.Value));
+
+            return tag;
+
+            string DoTranslate(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+
+                var matches = TranslationRegex.Matches(text);
+                foreach (Match match in matches)
+                {
+                    var dictionaryKey = match.Groups["dictionaryKey"].Value;
+                    text = text.Replace(match.Value, Translate.Text(dictionaryKey));
+                }
+                return text;
+            }
+        }
+
+        private static HtmlTag ApplyLinkSyntax(HtmlTag tag)
+        {
+            tag.Text = MakeUrl(tag.Text);
+            tag.Attributes = tag.Attributes?.ToDictionary(kv => kv.Key, e => MakeUrl(e.Value));
+
+            return tag;
+
+            string MakeUrl(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+
+                var matches = LinkRegex.Matches(text);
+                foreach (Match match in matches)
+                {
+                    var pathOrId = match.Groups["pathOrId"].Value;
+                    var item = Context.Database.GetItem(pathOrId);
+                    var url = item == null ? "#" : LinkManager.GetItemUrl(item);
+                    text = text.Replace(match.Value, url);
+                }
+                return text;
             }
         }
 
