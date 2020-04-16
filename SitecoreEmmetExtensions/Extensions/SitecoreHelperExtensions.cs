@@ -43,6 +43,7 @@ namespace SitecoreEmmetExtensions.Extensions
             Assert.ArgumentNotNull(helper, nameof(helper));
             Assert.ArgumentNotNullOrEmpty(abbreviation, nameof(abbreviation));
 
+            abbreviation = RemoveIgnoredCharacters(abbreviation);
             var result = Emmet.Expand(abbreviation, textFormatter, escapeText: false);
             return new HtmlString(result);
 
@@ -61,6 +62,15 @@ namespace SitecoreEmmetExtensions.Extensions
 
                 return tag;
             }
+        }
+
+        private static string RemoveIgnoredCharacters(string abbreviation)
+        {
+            var abbrs = Regex.Split(abbreviation, Environment.NewLine)
+                .Where(abbr => !string.IsNullOrWhiteSpace(abbr))
+                .Select(abbr => abbr.Trim());
+
+            return string.Join(string.Empty, abbrs);
         }
 
         private static HtmlTag ApplyFieldSyntax(SitecoreHelper helper, HtmlTag tag)
