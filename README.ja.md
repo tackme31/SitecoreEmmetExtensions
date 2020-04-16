@@ -55,7 +55,7 @@ div{[placeholder-key]}
 |`maxCount`|int|`Html.Sitecore().Placeholder`の`maxCount`引数に渡される値.|
 |`seed`|int|`Html.Sitecore().Placeholder`の`seed`引数に渡される値.|
 
-**パラメータ: 1:**  
+**展開例 1:**  
 - 入力
 ```
 div{@[placeholder-key]}
@@ -88,8 +88,8 @@ div{@[placeholder-key|count:3|seed:1]}
 |パラメータ|型|説明|
 |-|-|-|
 |`editable`|bool|エクスペリエンスエディタでの編集の無効化/有効化を指定する|
-|`fromPage`|bool|trueが指定されると、データソースの代わりに現在のページのフィールドを使用する|
-|`raw`|bool|trueが指定されると、フィールドのRaw値が表示される。|
+|`fromPage`|bool|trueを指定すると、データソースの代わりに現在のページのフィールドを使用する|
+|`raw`|bool|trueを指定すると、フィールドのRaw値が表示される。|
 
 **展開例 1:**
 - 入力
@@ -150,7 +150,7 @@ a[href="->(2f83dec8-25bd-4663-a11a-c294fd016573)"]{Link to about}
 ```
 
 **展開例 2:**  
-この構文はField構文と組み合わせて使用することもできます。以下の例ではSearch Pageフィールドで指定したアイテムへのリンクを生成しています。
+この構文はフィールド構文と組み合わせて使用することもできます。以下の例ではSearch Pageフィールドで指定したアイテムへのリンクを生成しています。
 
 - 入力
 ```
