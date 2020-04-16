@@ -162,10 +162,10 @@ a[href="->(#(Search Page|raw:true))"]{Link to search}
 @{
     var item = ...; // "Search Page"フィールドで指定したアイテム
 }
-<a href="@LinkManager.GetItemUrl(item)">Link to about</a>
+<a href="@LinkManager.GetItemUrl(item)">Link to search</a>
 ```
 
-**NOTE:**
+**注意:**  
 Emmetの短縮記法では、`p{foo}bar}`のようにテキスト内に波括弧を含めることができません。そのため、この構文でIDを使用する際には、例1のように波括弧無しで入力する必要があります。
 
 ## 参考リンク

@@ -42,7 +42,7 @@ div{[placeholder-key]}
 </div>
 ```
 
-**NOTE:**
+**NOTE:**  
 Using this syntax within the text is not allowed (e.g. `{foo[ph-within-text]bar}`). Split before and after the placeholder like `{foo}+{[ph-within-text]}+{bar}`.
 
 ### Dynamic Placeholder
@@ -161,10 +161,10 @@ a[href="->(#(Search Page|raw:true))"]{Link to search}
 @{
     var item = ...; // An item specified in the "Search Page" field.
 }
-<a href="@LinkManager.GetItemUrl(item)">Link to about</a>
+<a href="@LinkManager.GetItemUrl(item)">Link to search</a>
 ```
 
-**NOTE:**
+**NOTE:**  
 Due to Emmet's text syntax cannot be contained an end brace (e.g. `{foo}bar}`), so **an ID in link syntax should not contain braces like Example 1.**
 
 ## See also
