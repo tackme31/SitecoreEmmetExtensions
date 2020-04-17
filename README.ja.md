@@ -11,8 +11,30 @@
 [こちら](https://github.com/xirtardauq/flexible-container/releases)からパッケージをダウンロードし、インストールウィザードを使用してSitecoreにインストールしてください。
 
 ## 使い方
-1. レイアウト詳細に`Emmet Abbreviation`レンダリングを追加します。レンダリングは`Renderings/Feature/Sitecore Emmet Extensions`にあります。
-1. レンダリングの`Abbreviation`パラメータにEmmetの式を入力します。
+`Emmet Abbreviation`レンダリングを使うことで、Emmet記法のコンテンツを表示することができます。（`/sitecore/Layouts/Renderings/Feature/Sitecore Emmet Extensions`にあります）
+
+1. ページに`Emmet Abbreviation`レンダリングを追加します。  
+1. レンダリングの`Abbreviation`パラメータにEmmet記法でコンテンツを入力します。  
+
+<details>
+  <summary>図解を見る</summary>
+  <img src="./img/usage01.png">
+  <img src="./img/usage02.png">
+</details>
+
+### コンテンツの再利用方法
+コンテンツに名前を付けたり使い回したりするには、`Emmet Rendering`テンプレートを使用します。（`/sitecore/templates/Foundation/Sitecore Emmet Extensions/Renderings`にあります）
+
+1. `Emmet Rendering`テンプレートのレンダリングアイテムを作成します。  
+1. 作成したレンダリングの`Abbreviation`フィールドにEmmet記法でコンテンツを入力します。  
+1. ページに作成したレンダリングを追加します。  
+
+<details>
+  <summary>図解を見る</summary>
+  <img src="./img/usage03.png">
+  <img src="./img/usage04.png">
+  <img src="./img/usage05.png">
+</details>
 
 ## 特殊構文
 *Sitecore Emmet Extensions*には、[通常のEmmetの構文](https://github.com/xirtardauq/EmmetSharp)に加えて、以下のような特殊な構文が追加されています。
@@ -23,7 +45,7 @@
 - [翻訳](#user-content-翻訳)
 - [リンク](#user-content-リンク)
 
-それぞれの展開例の結果は、あくまで同じように出力されるRazor文を表しています。実際にはRazor文を介さずに直接HTMLが生成されます。
+以下で説明する展開例は、あくまで同じように出力されるRazor文を表しています。実際にはRazor文を介さずに直接HTMLが生成されます。
 
 ### 静的プレースホルダ
 **構文:** `[placeholder-key]`
@@ -133,7 +155,7 @@ h1{@(Title)}
 ```
 
 ### リンク
-**構文:** `->(Path or ID)`
+**構文:** `->(path-or-id)`
 
 **展開例 1:**
 - 入力

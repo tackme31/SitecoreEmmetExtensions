@@ -11,8 +11,30 @@
 Download the package from [here](https://github.com/xirtardauq/flexible-container/releases) and install it to Sitecore.
 
 ## Usage
-1. Add `Emmet Abbreviation` rendering (located in `Renderings/Feature/Sitecore Emmet Extensions`) to the page layout.
-1. Set an abbreviation to the `Abbreviation` rendering parameter.
+Use the `Emmet Abbreviation` rendering (located in `/sitecore/Layout/Renderings/Feature/Sitecore Emmet Extensions`) to render an abbreviation.  
+
+1. Add the `Emmet Abbreviation` rendering to a page.
+1. Set an abbreviation to the `Abbreviation` rendering parameter.  
+
+<details>
+  <summary>See images</summary>
+  <img src="./img/usage01.png">
+  <img src="./img/usage02.png">
+</details>
+
+### Reuse Abbreviation
+If you want to name and reuse an abbreviation, use the `Emmet Rendering` template (located in `/sitecore/templates/Foundation/Sitecore Emmet Extensions/Renderings`).
+
+1. Create a rendering item derived from the `Emmet Rendering` template.  
+1. Set an abbreviation to the `Abbreviation` field of the rendering.  
+1. Add the rendering to a page.  
+
+<details>
+  <summary>See images</summary>
+  <img src="./img/usage03.png">
+  <img src="./img/usage04.png">
+  <img src="./img/usage05.png">
+</details>
 
 ## Special Syntax
 In *Sitecore Emmet Extensions*, the following syntax can be used in addition to [Emmet syntax](https://github.com/xirtardauq/EmmetSharp).
@@ -23,7 +45,7 @@ In *Sitecore Emmet Extensions*, the following syntax can be used in addition to 
 - [Translation](#user-content-translation)
 - [Link](#user-content-link)
 
-All example's result just means a Razor code that is output as the same result. In reality, the result is directly rendered as an HTML code.
+All the following examples just means a Razor code that is output as the same result. In reality, the result is directly rendered as HTML without going through Razor code.
 
 ### Static Placeholder
 **Syntax:** `[placeholder-key]`
@@ -132,7 +154,7 @@ h1{@(Title)}
 ```
 
 ### Link
-**Syntax:** `->(Path or ID)`
+**Syntax:** `->(path-or-id)`
 
 **Example 1:**
 - Abbreviation
