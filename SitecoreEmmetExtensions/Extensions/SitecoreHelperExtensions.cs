@@ -98,8 +98,9 @@ namespace SitecoreEmmetExtensions.Extensions
 
                     var parameters = ParseParameters(match.Groups["parameters"].Value);
                     var fromPage = MainUtil.GetBool(parameters["fromPage"], false);
-                    var source = ResolveSource(fieldName, fromPage);
                     var rawValue = MainUtil.GetBool(parameters["raw"], false);
+
+                    var source = ResolveSource(fieldName, fromPage);
                     if (rawValue)
                     {
                         text = text.Replace(match.Value, source.item[source.field]);
@@ -120,24 +121,23 @@ namespace SitecoreEmmetExtensions.Extensions
                 var item = fromPage
                     ? RenderingContext.Current.PageContext.Item
                     : RenderingContext.Current.Rendering.Item;
-                var fieldNames = text?.Split('.') ?? Array.Empty<string>();
-                if (fieldNames.Length <= 1)
+                var sourceNames = text?.Split('.')?.ToList();
+                if (sourceNames == null || !sourceNames.Any())
                 {
                     return (text, item);
                 }
 
-                foreach (var fieldName in fieldNames)
-                {
-                    var targetItem = ((LinkField)item.Fields[fieldName])?.TargetItem ?? ((ReferenceField)item.Fields[fieldName])?.TargetItem;
-                    if (targetItem == null)
-                    {
-                        return (fieldName, item);
-                    }
+                var fieldName = sourceNames.Last();
+                var source = sourceNames.GetRange(0, sourceNames.Count - 1).Aggregate(item, GetTargetItem);
+                return source == null
+                    ? (text, item)
+                    : (fieldName, source);
+            }
 
-                    item = targetItem;
-                }
-
-                return (text, item);
+            Item GetTargetItem(Item item, string fieldName)
+            {
+                return ((LinkField)item?.Fields[fieldName])?.TargetItem
+                    ?? ((ReferenceField)item?.Fields[fieldName])?.TargetItem;
             }
         }
 
