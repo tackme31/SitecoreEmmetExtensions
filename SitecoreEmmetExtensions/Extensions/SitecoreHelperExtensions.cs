@@ -56,7 +56,6 @@ namespace SitecoreEmmetExtensions.Extensions
                 tag = ApplyStaticPlaceholderSyntax(helper, tag);
                 tag.Text = tag.Text
                     .Replace("\\[", "[").Replace("\\]", "]")
-                    .Replace("\\{", "{").Replace("\\}", "}")
                     .Replace("\\(", "(").Replace("\\)", ")")
                     .Replace("\\\\", "\\");
 
