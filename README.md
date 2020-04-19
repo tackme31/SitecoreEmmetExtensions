@@ -194,7 +194,7 @@ Due to Emmet's text syntax cannot be contained an end brace (e.g. `{foo}bar}`), 
 - [xirtardauq/EmmetSharp: An Emmet abbreviation parser written in C#](https://github.com/xirtardauq/EmmetSharp)
 
 ## License
-*Sitecore Emmet Extensions* is licensed unther the MIT license. See LICENSE.txt.
+*Sitecore Emmet Extensions* is licensed under the MIT license. See LICENSE.txt.
 
 ## Author
 - Takumi Yamada (xirtardauq@gmail.com)
